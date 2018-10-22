@@ -26,4 +26,8 @@ void timer_a0_config(){
     TIMER_A0->CTL = SET_CTL;            // Set to SMCLK, Up mode (BIT9 ON)
     TIMER_A0->CCR[0] = COUNT_TO;        // Value to count to
     TIMER_A0->CCTL[0] |= SET_CCTL;      // TACCR0 interrupt enabled
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4

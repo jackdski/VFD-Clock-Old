@@ -32,7 +32,11 @@
 *
 * Default linker command file for Texas Instruments MSP432P401R
 *
+<<<<<<< HEAD
 * File creation date: 12/06/17
+=======
+* File creation date: 10/13/17
+>>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4
 *
 *****************************************************************************/
 

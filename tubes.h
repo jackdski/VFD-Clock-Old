@@ -36,4 +36,8 @@ void updateHours(uint8_t value);
 
 void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs);
 
+<<<<<<< HEAD
 void shiftOut(uint8_t tubeNumber, uint8_t val);
+=======
+void shiftOut(uint8_t tubeNumber, uint8_t val);
+>>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4

@@ -16,4 +16,8 @@ void configure_uart();
 
 void configure_buttons();
 
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4

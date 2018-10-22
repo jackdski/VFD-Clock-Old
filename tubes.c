@@ -218,4 +218,8 @@ void shiftOut(uint8_t tubeNumber, uint8_t val) {
     P4->OUT |= BIT1; // latch
 //    P4->OUT &= ~(BIT1); // latch
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4
