@@ -1,365 +1,220 @@
 /*
- *
  * Jack Danielski
  * VFD Tube Clock
  *  tubes.c
  *
+ *  Contains functions that utilize shift registers to update
+ *  the 7-segment displays
  */
 
 #include "msp.h"
-#include "stdlib.h"
+#include <stdint.h>
 #include "tubes.h"
 
 /*
- * Segment declarations
+ * Binary values that will display the corresponding
+ * numbers on the seven segment displays after being
+ * loaded to the shift register
  */
-// Tube 1
-extern vfdSeg_t * oneA;
-extern vfdSeg_t * oneB;
-extern vfdSeg_t * oneC;
-extern vfdSeg_t * oneD;
-extern vfdSeg_t * oneE;
-extern vfdSeg_t * oneF;
-extern vfdSeg_t * oneG;
-extern vfdSeg_t * oneDP;
-// Tube 2
-extern vfdSeg_t * twoA;
-extern vfdSeg_t * twoB;
-extern vfdSeg_t * twoC;
-extern vfdSeg_t * twoD;
-extern vfdSeg_t * twoE;
-extern vfdSeg_t * twoF;
-extern vfdSeg_t * twoG;
-extern vfdSeg_t * twoDP;
-// Tube 3
-extern vfdSeg_t * threeA;
-extern vfdSeg_t * threeB;
-extern vfdSeg_t * threeC;
-extern vfdSeg_t * threeD;
-extern vfdSeg_t * threeE;
-extern vfdSeg_t * threeF;
-extern vfdSeg_t * threeG;
-extern vfdSeg_t * threeDP;
-// Tube 4
-extern vfdSeg_t * fourA;
-extern vfdSeg_t * fourB;
-extern vfdSeg_t * fourC;
-extern vfdSeg_t * fourD;
-extern vfdSeg_t * fourE;
-extern vfdSeg_t * fourF;
-extern vfdSeg_t * fourG;
-extern vfdSeg_t * fourDP;
-// Tube 5
-extern vfdSeg_t * fiveA;
-extern vfdSeg_t * fiveB;
-extern vfdSeg_t * fiveC;
-extern vfdSeg_t * fiveD;
-extern vfdSeg_t * fiveE;
-extern vfdSeg_t * fiveF;
-extern vfdSeg_t * fiveG;
-extern vfdSeg_t * fiveDP;
-// Tube 6
-extern vfdSeg_t * sixA;
-extern vfdSeg_t * sixB;
-extern vfdSeg_t * sixC;
-extern vfdSeg_t * sixD;
-extern vfdSeg_t * sixE;
-extern vfdSeg_t * sixF;
-extern vfdSeg_t * sixG;
-extern vfdSeg_t * sixDP;
+#define ZERO        0b00111111; // 0x3F
+#define ONE         0b00110000; // 0x30
+#define TWO         0b01011011; // 0x5B
+#define THREE       0b01001111; // 0x4F
+#define FOUR        0b01100110; // 0x66
+#define FIVE        0b01101101; // 0x6D
+#define SIX         0b01111101; // 0x7D
+#define SEVEN       0b00000111; // 0x07
+#define EIGHT       0b01111111; // 0x7F
+#define NINE        0b01101111; // 0x6F
 
 /*
- * Tube declarations
+ *  Pin numbers on Port 4 that connect to the
+ *  serial pin of the shift register
  */
-extern vfdTube_t * hoursOne;
-extern vfdTube_t * hoursTwo;
-extern vfdTube_t * minutesOne;
-extern vfdTube_t * minutesTwo;
-extern vfdTube_t * secondsOne;
-extern vfdTube_t * secondsTwo;
+#define TUBE_1_SER      2   // Hours 1
+#define TUBE_2_SER      3   // Hours 2
+#define TUBE_3_SER      4   // Minutes 1
+#define TUBE_4_SER      5   // Minutes 2
+#define TUBE_5_SER      6   // Seconds 1
+#define TUBE_6_SER      7   // Seconds 2
 
-
-vfdSeg_t * create_vfd_seg( uint8_t pb ) {
-//      uint8_t port, uint8_t bitnumber) {
-//    if( !port )
-//        return NULL;
-//
-//    else {
-//        vfdSeg_t * temp = malloc(sizeof(vfdSeg_t));
-//        temp->port = port;
-//        temp->bitnum = bitnumber;
-//        return temp;
-//    }
-    vfdSeg_t * temp = malloc( sizeof(vfdSeg_t) );
-    temp->port = pb / 10;
-    temp->bitnum = pb % 10;
-    return temp;
+/* timer used for shift register delays */
+void enableSystick(uint16_t microseconds) {
+    SysTick->LOAD = 3 * microseconds;;
+    SysTick->CTRL = BIT0 | BIT1 | BIT2; // enable bits
 }
 
-void makeVFDsegs() {
-    oneA = create_vfd_seg(ONEA);
-    oneB = create_vfd_seg(ONEB);
-    oneC = create_vfd_seg(ONEC);
-    oneD = create_vfd_seg(ONED);
-    oneE = create_vfd_seg(ONEE);
-    oneF = create_vfd_seg(ONEF);
-    oneG = create_vfd_seg(ONEG);
-    oneDP = create_vfd_seg(ONEDP);
-    twoA = create_vfd_seg(TWOA);
-    twoB = create_vfd_seg(TWOB);
-    twoC = create_vfd_seg(TWOC);
-    twoD = create_vfd_seg(TWOD);
-    twoE = create_vfd_seg(TWOE);
-    twoF = create_vfd_seg(TWOF);
-    twoG = create_vfd_seg(TWOG);
-    twoDP = create_vfd_seg(TWODP);
-    threeA = create_vfd_seg(THREEA);
-    threeB = create_vfd_seg(THREEB);
-    threeC = create_vfd_seg(THREEC);
-    threeD = create_vfd_seg(THREED);
-    threeE = create_vfd_seg(THREEE);
-    threeF = create_vfd_seg(THREEF);
-    threeG = create_vfd_seg(THREEG);
-    threeDP = create_vfd_seg(THREEDP);
-    fourA = create_vfd_seg(FOURA);
-    fourB = create_vfd_seg(FOURB);
-    fourC = create_vfd_seg(FOURC);
-    fourD = create_vfd_seg(FOURD);
-    fourE = create_vfd_seg(FOURE);
-    fourF = create_vfd_seg(FOURF);
-    fourG = create_vfd_seg(FOURG);
-    fourDP = create_vfd_seg(FOURDP);
-    fiveA = create_vfd_seg(FIVEA);
-    fiveB = create_vfd_seg(FIVEB);
-    fiveC = create_vfd_seg(FIVEC);
-    fiveD = create_vfd_seg(FIVED);
-    fiveE = create_vfd_seg(FIVEE);
-    fiveF = create_vfd_seg(FIVEF);
-    fiveG = create_vfd_seg(FIVEG);
-    fiveDP = create_vfd_seg(FIVEDP);
-    sixA = create_vfd_seg(SIXA);
-    sixB = create_vfd_seg(SIXB);
-    sixC = create_vfd_seg(SIXC);
-    sixD = create_vfd_seg(SIXD);
-    sixE = create_vfd_seg(SIXE);
-    sixF = create_vfd_seg(SIXF);
-    sixG = create_vfd_seg(SIXG);
-    sixDP = create_vfd_seg(SIXDP);
+/* disable the delay timer */
+void disableSystick() {
+    SysTick->CTRL &= ~(BIT0 | BIT1 | BIT2);
 }
 
-void update_seg_on(vfdSeg_t * seg) {
-    switch( seg->port ) {
-    case 1:
-        P1->OUT |= BIT(seg->bitnum);
-        break;
-    case 2:
-        P2->OUT |= BIT(seg->bitnum);
-        break;
-    case 3:
-        P3->OUT |= BIT(seg->bitnum);
-        break;
-    case 4:
-        P4->OUT |= BIT(seg->bitnum);
-        break;
-    case 5:
-        P5->OUT |= BIT(seg->bitnum);
-        break;
-    case 6:
-        P6->OUT |= BIT(seg->bitnum);
-        break;
-    case 7:
-        P7->OUT |= BIT(seg->bitnum);
-        break;
-    case 8:
-        P8->OUT |= BIT(seg->bitnum);
-        break;
-    case 9:
-        P9->OUT |= BIT(seg->bitnum);
-        break;
-    case 10:
-        P10->OUT |= BIT(seg->bitnum);
-        break;
+/* disable the delay timer after it counts down all the way */
+void SysTick_Handler() {
+    SysTick->CTRL &= ~(BIT0 | BIT1 | BIT2); // disable SysTick
+}
+
+/* 1-6 for select tubes, 7 for all */
+void disableOutput(uint8_t target) {
+    if(target == 7) {
+        P3->OUT |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
     }
-}
-
-void update_seg_off(vfdSeg_t * seg) {
-    switch( seg->port ) {
-    case 1:
-        P1->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 2:
-        P2->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 3:
-        P3->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 4:
-        P4->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 5:
-        P5->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 6:
-        P6->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 7:
-        P7->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 8:
-        P8->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 9:
-        P9->OUT &= ~BIT(seg->bitnum);
-        break;
-    case 10:
-        P10->OUT &= ~BIT(seg->bitnum);
-        break;
-    }
-}
-
-vfdTube_t * create_vfd_tube(vfdSeg_t * sa, vfdSeg_t * sb, vfdSeg_t * sc, vfdSeg_t * sd,
-                            vfdSeg_t * se, vfdSeg_t * sf, vfdSeg_t * sg, vfdSeg_t * sdp)
-{
-
-    if( !sa->port || !sb->port || !sc->port || !sd->port || !se->port || !sf->port || !sg->port || !sdp->port )
-        return NULL;
-
-    if( !sa->bitnum || !sb->bitnum || !sc->bitnum || !sd->bitnum || !se->bitnum || !sf->bitnum || !sg->bitnum || !sdp->bitnum )
-        return NULL;
-
     else {
-        vfdTube_t * temp = malloc(sizeof(vfdTube_t));
-        temp->a = *sa;
-        temp->b = *sb;
-        temp->c = *sc;
-        temp->d = *sd;
-        temp->e = *se;
-        temp->f = *sf;
-        temp->g = *sg;
-        temp->dp = *sdp;
-        return temp;
+        P3->OUT |= BIT(target-1);
     }
 }
 
-void sevensegConversion(vfdTube_t * current, uint8_t value) {
-    switch( value ) {
-    case 0:
-        update_seg_on( &current->a );
-        update_seg_on( &current->b );
-        update_seg_on( &current->c );
-        update_seg_on( &current->d );
-        update_seg_on( &current->e );
-        update_seg_on( &current->f );
-        update_seg_off( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 1:
-        update_seg_off( &current->a );
-        update_seg_off( &current->b );
-        update_seg_off( &current->c );
-        update_seg_off( &current->d );
-        update_seg_on( &current->e );
-        update_seg_on( &current->f );
-        update_seg_off( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 2:
-        update_seg_on( &current->a );
-        update_seg_on( &current->b );
-        update_seg_off( &current->c );
-        update_seg_on( &current->d );
-        update_seg_on( &current->e );
-        update_seg_off( &current->f );
-        update_seg_on( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 3:
-        update_seg_on( &current->a );
-        update_seg_on( &current->b );
-        update_seg_on( &current->c );
-        update_seg_on( &current->d );
-        update_seg_off( &current->e );
-        update_seg_off( &current->f );
-        update_seg_on( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 4:
-        update_seg_off( &current->a );
-        update_seg_on( &current->b );
-        update_seg_on( &current->c );
-        update_seg_off( &current->d );
-        update_seg_off( &current->e );
-        update_seg_on( &current->f );
-        update_seg_on( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 5:
-        update_seg_on( &current->a );
-        update_seg_off( &current->b );
-        update_seg_on( &current->c );
-        update_seg_on( &current->d );
-        update_seg_off( &current->e );
-        update_seg_on( &current->f );
-        update_seg_on( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 6:
-        update_seg_on( &current->a );
-        update_seg_off( &current->b );
-        update_seg_on( &current->c );
-        update_seg_on( &current->d );
-        update_seg_on( &current->e );
-        update_seg_on( &current->f );
-        update_seg_on( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 7:
-        update_seg_on( &current->a );
-        update_seg_on( &current->b );
-        update_seg_on( &current->c );
-        update_seg_off( &current->d );
-        update_seg_off( &current->e );
-        update_seg_off( &current->f );
-        update_seg_off( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 8:
-        update_seg_on( &current->a );
-        update_seg_on( &current->b );
-        update_seg_on( &current->c );
-        update_seg_on( &current->d );
-        update_seg_on( &current->e );
-        update_seg_on( &current->f );
-        update_seg_on( &current->g );
-        update_seg_off( &current->dp );
-        break;
-    case 9:
-        update_seg_on( &current->a );
-        update_seg_on( &current->b );
-        update_seg_on( &current->c );
-        update_seg_on( &current->d );
-        update_seg_off( &current->e );
-        update_seg_on( &current->f );
-        update_seg_on( &current->g );
-        update_seg_off( &current->dp );
-        break;
+/* Enable the output from the shift register */
+void enableOutput(uint8_t target) {
+    if(target == 7) {
+        P3->OUT &= ~( BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 );
+    }
+    else {
+        P3->OUT &= ~BIT(target-1);
     }
 }
 
-// converts Decimal number to two 7seg numbers
-void dec_to_seven_seg(vfdTube_t * firstVFD, vfdTube_t * secondVFD, uint8_t hms) {
-    // find the values that firstVFD and secondsVFD should display
-    uint8_t ones = hms % 10;
-    uint8_t tens = hms / 10;
-
-    // convert values to 7seg
-    sevensegConversion(firstVFD, tens);
-    sevensegConversion(secondVFD, ones);
+/* Pulse clock pin to shift a bit in the shift registers  */
+void pulseClock() {
+    P4->OUT |= BIT0;
+    P4->OUT &= ~(BIT0);
 }
 
-void update_tubes(uint8_t hours, uint8_t minutes, uint8_t seconds) {
-    dec_to_seven_seg(hoursOne, hoursTwo, hours);
-    dec_to_seven_seg(minutesOne, minutesTwo, minutes);
-    dec_to_seven_seg(secondsOne, secondsTwo, seconds);
+/* Configures the shift registers to be used */
+void configureShiftPins() {
+    P4->SEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P3->SEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
+
+    P4->SEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P3->SEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
+
+    // set to output
+    P4->DIR |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P3->DIR |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
+
+    // set all outputs low
+    P4->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P3->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
+}
+
+
+/* returns a value that will show the input value
+ * in the uint8_t on 7-seg display
+ */
+uint8_t decToSevSeg(uint8_t value) {
+    switch(value) {
+        case 0: return ZERO;
+        case 1: return ONE;
+        case 2: return TWO;
+        case 3: return THREE;
+        case 4: return FOUR;
+        case 5: return FIVE;
+        case 6: return SIX;
+        case 7: return SEVEN;
+        case 8: return EIGHT;
+        case 9: return NINE;
+        default: return ZERO;
+    }
+}
+
+/* sets a pin for an assigned tube high or low */
+void assignPin(uint8_t tube, uint8_t val) {
+    if(val == 1)
+        P4->OUT |= BIT(tube+1);
+    else
+        P4->OUT &= ~BIT(tube+1);
+}
+
+/* updates only the two tubes related to seconds */
+void updateSeconds(uint8_t value) {
+    P4->OUT &= ~(BIT1); // latch
+
+    uint8_t secsOne = decToSevSeg(value / 10);
+    uint8_t secsTwo = decToSevSeg(value % 10);
+
+    uint8_t i;
+    for(i = 0; i < 8; i++) {
+        assignPin(5, (secsOne & (1 << i)));
+        assignPin(6, (secsTwo & (1 << i)));
+        pulseClock();
+    }
+    P4->OUT |= BIT1;
+    P4->OUT &= ~BIT1;
+}
+
+/* updates only the two tubes related to minutes */
+void updateMinutes(uint8_t value) {
+    P4->OUT &= ~(BIT1); // latch
+
+    uint8_t minsOne = decToSevSeg(value / 10);
+    uint8_t minsTwo = decToSevSeg(value % 10);
+    uint8_t i;
+    for(i = 0; i < 8; i++) {
+        assignPin(5, (minsOne & (1 << i)));
+        assignPin(6, (minsTwo & (1 << i)));
+        pulseClock();
+    }
+    P4->OUT |= BIT1;
+    P4->OUT &= ~BIT1;
+}
+
+/* updates only the two tubes related to seconds */
+void updateHours(uint8_t value) {
+    P4->OUT &= ~(BIT1); // latch
+    uint8_t i;
+    uint8_t hrsOne = decToSevSeg(value / 10);
+    uint8_t hrsTwo = decToSevSeg(value % 10);
+
+    for(i = 0; i < 8; i++) {
+        assignPin(5, (hrsOne & (1 << i)));
+        assignPin(6, (hrsTwo & (1 << i)));
+        pulseClock();
+    }
+    P4->OUT |= BIT1;
+    P4->OUT &= ~BIT1;
+}
+
+/* updates hours, minutes, and seconds all at once */
+void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
+    P4->OUT &= ~(BIT1); // Put latch low
+
+    uint8_t segHrsOne = decToSevSeg(decHrs / 10);
+    uint8_t segHrsTwo = decToSevSeg(decHrs % 10);
+    uint8_t segMinsOne = decToSevSeg(decMins / 10);
+    uint8_t segMinsTwo = decToSevSeg(decMins % 10);
+    uint8_t segSecsOne = decToSevSeg(decSecs / 10);
+    uint8_t segSecsTwo = decToSevSeg(decSecs % 10);
+
+    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+
+    // write the values to the tubes
+    shiftOut(1, segHrsOne);
+    shiftOut(2, segHrsTwo);
+    shiftOut(3, segMinsOne);
+    shiftOut(4, segMinsTwo);
+    shiftOut(5, segSecsOne);
+    shiftOut(6, segSecsTwo);
+
+
+    P4->OUT |= BIT1;
+//    P4->OUT &= ~BIT1;
+}
+
+/* places a value in the shift register */
+void shiftOut(uint8_t tubeNumber, uint8_t val) {
+    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+    uint8_t i;
+    for(i = 0; i < 8; i++) {
+//        assignPin(1, (val & (1 << i))); // P4.2 (SER) for tube 1
+
+        assignPin(tubeNumber+1, (val & (1 << i))); // P4.2 (SER) for tube 1
+
+        P4->OUT ^= BIT2; // test value
+        pulseClock(); // P4.0
+        P4->OUT |= BIT0;
+        P4->OUT ^= BIT0;
+    }
+    P4->OUT |= BIT1; // latch
+//    P4->OUT &= ~(BIT1); // latch
 
 }
