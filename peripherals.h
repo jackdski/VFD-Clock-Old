@@ -13,7 +13,7 @@
 #include "rtc.h"
 #include "tubes.h"
 
-//void configure_uart();
+void configure_uart();
 
 void configure_buttons();
 
