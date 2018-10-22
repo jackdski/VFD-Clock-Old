@@ -20,8 +20,4 @@
 
 void timer_a0_config();
 
-<<<<<<< HEAD
 #endif /* TIMER_H_ */
-=======
-#endif /* TIMER_H_ */
->>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4

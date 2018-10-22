@@ -17,8 +17,4 @@ void configure_rtc() {
 
     RTC_C->TIM0 |= RTC_C_TIM0_SEC_MASK;
     RTC_C->CTL0 = 0xFF;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4
