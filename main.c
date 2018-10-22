@@ -12,29 +12,40 @@
 #include "timer.h"
 
 /*
- * Time initialization declarations
+ * Display initializes to all segments on
  *  -Defaults to 00:00:00
  *  -Tube order: 12:34:56
  */
-volatile uint8_t hours = 0;
-volatile uint8_t minutes = 0;
-volatile uint8_t seconds = 0;
+volatile uint8_t hours = 0b1111111;//0;
+volatile uint8_t minutes = 0b1111111;//0;
+volatile uint8_t seconds = 0b1111111;//0;
+
+volatile uint8_t onOff = 1;         // 0 = blanks, 1 = current time
+volatile uint8_t setupChanged = 0;  // for setup mode
 
 void main(void) {
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
 
     // configure peripherals
+	configure_all_pins();
 	configure_rtc();
 	configure_uart();
 	configure_buttons();
 
 	// startup config
-	uint8_t run_startup = 1;
-	uint8_t count_presses = 0;
+	//	uint8_t count_presses = 0;
 
+	/* SETUP LOOP */
 	/* unused while displaying to clock is being written */
 	/* Flash until switch is moved to the SETUP position */
-	/* while(!(P5->IN & BIT0)) {} */
+	while(!(P5->IN & BIT0)) {
+        if(setupChanged) {
+            showTimeSetUp(onOff);
+            setupChanged = 0;
+        }
+    }
+
+	/* MAIN LOOP */
 	while(1) {
 	    // NORMAL position - switch is low so run normal clock loop
 	    if( !(P5->IN & BIT0) ) {
@@ -73,6 +84,10 @@ void main(void) {
 	        uint32_t i;
 	        for(i = 0; i < 25000; i++);
 	        P1->OUT ^= BIT0;
+	        /* alternate between displaying the current time and blanks */
+	        if(setupChanged)
+	            showTimeSetUp(onOff);
+	            setupChanged = 0;
 	    }
 	}
 }

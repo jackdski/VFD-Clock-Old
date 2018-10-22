@@ -16,4 +16,6 @@ void configure_uart();
 
 void configure_buttons();
 
+void configure_all_pins();
+
 #endif

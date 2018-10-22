@@ -30,8 +30,7 @@ void pulseClock();
 void configureShiftPins();
 
 /* returns a value that will show the input value
- * in the uint8_t on 7-seg display
- */
+ * in the uint8_t on 7-seg display */
 uint8_t decToSevSeg(uint8_t value);
 
 /* sets a pin for an assigned tube high or low */
