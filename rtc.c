@@ -1,9 +1,8 @@
 /*
- *
  * Jack Danielski
  * VFD Tube Clock
- *  rtc.c
  *
+ * rtc.c
  */
 
 #include "msp.h"

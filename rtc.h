@@ -1,9 +1,8 @@
 /*
- *
  * Jack Danielski
  * VFD Tube Clock
- *  rtc.h
  *
+ * rtc.h
  */
 
 #ifndef RTC_H_

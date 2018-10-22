@@ -1,9 +1,8 @@
 /*
- *
- * Jack Danielski
  * VFD Tube Clock
- *  peripherals.h
+ * Jack Danielski
  *
+ *  peripherals.c
  */
 
 #include "msp.h"

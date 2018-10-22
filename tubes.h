@@ -1,7 +1,8 @@
 /*
  * Jack Danielski
  * VFD Tube Clock
- *  tubes.h
+ *
+ * tubes.h
  */
 
 #include "msp.h"

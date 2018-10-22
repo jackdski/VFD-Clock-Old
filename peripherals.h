@@ -1,9 +1,8 @@
 /*
- *
  * Jack Danielski
  * VFD Tube Clock
- *  peripherals.h
  *
+ * peripherals.h
  */
 
 #ifndef PERIPHERALS_H_

@@ -1,15 +1,15 @@
 /**
- *
  *  VFD Tube Clock
- *  main.c
  *  Author: Jack Danielski
  *
+ *  main.c
  */
 
 #include "msp.h"
 #include "rtc.h"
 #include "tubes.h"
 #include "peripherals.h"
+#include "timer.h"
 
 /*
  * Time initialization declarations
@@ -19,11 +19,6 @@
 volatile uint8_t hours = 0;
 volatile uint8_t minutes = 0;
 volatile uint8_t seconds = 0;
-
-/*
- * Mode stuff
- */
-//Mode state = clock;
 
 void main(void) {
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
@@ -39,9 +34,7 @@ void main(void) {
 
 	/* unused while displaying to clock is being written */
 	/* Flash until switch is moved to the SETUP position */
-/*  while(!(P5->IN & BIT0)) {
-	}
-*/
+	/* while(!(P5->IN & BIT0)) {} */
 	while(1) {
 	    // NORMAL position - switch is low so run normal clock loop
 	    if( !(P5->IN & BIT0) ) {
@@ -67,7 +60,6 @@ void main(void) {
             if(seconds % 2 != 0) {
                 P1->OUT &= ~BIT0;
             }
-//          update_tubes(hours, minutes, seconds);
             updateTime(hours, minutes, seconds);
 	    }
 

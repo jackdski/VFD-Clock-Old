@@ -1,7 +1,8 @@
 /*
  * Jack Danielski
  * VFD Tube Clock
- *  tubes.c
+ *
+ * tubes.c
  *
  *  Contains functions that utilize shift registers to update
  *  the 7-segment displays
