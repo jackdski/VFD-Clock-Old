@@ -162,10 +162,9 @@ void updateMinutes(uint8_t value) {
 /* updates only the two tubes related to seconds */
 void updateHours(uint8_t value) {
     P4->OUT &= ~(BIT1); // latch
-    uint8_t i;
     uint8_t hrsOne = decToSevSeg(value / 10);
     uint8_t hrsTwo = decToSevSeg(value % 10);
-
+    uint8_t i;
     for(i = 0; i < 8; i++) {
         assignPin(5, (hrsOne & (1 << i)));
         assignPin(6, (hrsTwo & (1 << i)));
@@ -196,14 +195,13 @@ void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     shiftOut(5, segSecsOne);
     shiftOut(6, segSecsTwo);
 
-
-    P4->OUT |= BIT1;
-//    P4->OUT &= ~BIT1;
+    P4->OUT |= BIT1;    // set latch !SRCLR high
 }
 
 /* places a value in the shift register */
 void shiftOut(uint8_t tubeNumber, uint8_t val) {
-    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+    //P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+
     uint8_t i;
     for(i = 0; i < 8; i++) {
 //        assignPin(1, (val & (1 << i))); // P4.2 (SER) for tube 1
@@ -215,7 +213,7 @@ void shiftOut(uint8_t tubeNumber, uint8_t val) {
         P4->OUT |= BIT0;
         P4->OUT ^= BIT0;
     }
-    P4->OUT |= BIT1; // latch
+//    P4->OUT |= BIT1; // latch
 //    P4->OUT &= ~(BIT1); // latch
 
 }

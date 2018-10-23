@@ -7,6 +7,7 @@
 
 #include "msp.h"
 #include "rtc.h"
+#include <stdint.h>
 #include "tubes.h"
 
 //extern Mode state;
@@ -14,7 +15,7 @@ extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
 
-// configure on P3.2 and P3.3 to be used for UART
+// configure on P3.2 and P3.3 to be used for UART, if necessary
 void configure_uart(){
     //Configure UART pins, set 2-UART pins to UART mode
     P1->SEL0 |=  (BIT2 | BIT3);
@@ -50,6 +51,8 @@ void configure_buttons() {
     P5->DIR &= ~(BIT1 | BIT4 | BIT5);  // put to input direction
     P5->REN |= (BIT1 | BIT4 | BIT5);    // enable pullup/down resistor
     P5->OUT &= ~(BIT1 | BIT4 | BIT5);   // enable pulldown resistor
+
+    NVIC_EnableIRQ(PORT5_IRQn);
 }
 
 /* set all unused pins to low for power reasons */

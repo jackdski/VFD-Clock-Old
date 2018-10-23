@@ -32,7 +32,8 @@ void main(void) {
 	configure_uart();
 	configure_buttons();
 
-	// startup config
+	__enable_irq();
+
 	//	uint8_t count_presses = 0;
 
 	/* SETUP LOOP */
@@ -50,6 +51,7 @@ void main(void) {
 	    // NORMAL position - switch is low so run normal clock loop
 	    if( !(P5->IN & BIT0) ) {
             seconds = RTCSEC;
+            // make sure hms increments correctly
             if(seconds == 0) {
                 if(minutes == 59) {
                     minutes = 0;
@@ -65,22 +67,20 @@ void main(void) {
                     P1->OUT ^= BIT0;
                 }
             }
+            // blink light at 1Hz
             if(seconds % 2 == 0) {
                 P1->OUT |= BIT0;
             }
             if(seconds % 2 != 0) {
                 P1->OUT &= ~BIT0;
             }
+
+            // push newly calculated time to the displays
             updateTime(hours, minutes, seconds);
 	    }
 
 	    // SETUP position - switch is high so run time-picking mode
 	    if( P5->IN & BIT0 ) {
-	        /* to do:
-	         *  - write function to flash current input
-	         *  - write function to flash a blank display
-	         *  - set up 0.5s timer to be used in these functions
-	         */
 	        uint32_t i;
 	        for(i = 0; i < 25000; i++);
 	        P1->OUT ^= BIT0;

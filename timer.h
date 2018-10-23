@@ -21,4 +21,7 @@
 
 void timer_a0_config();
 
+/* Will display a time or blanks depending on the input */
+void showTimeSetUp(uint8_t onOff);
+
 #endif /* TIMER_H_ */
