@@ -5,7 +5,6 @@
 	<projects>
 	</projects>
 	<buildSpec>
-<<<<<<< HEAD
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
 			<arguments>
@@ -24,9 +23,5 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
-=======
-	</buildSpec>
-	<natures>
->>>>>>> e3bd3428fc2b968ce834a8b4b12ab243e27898d4
 	</natures>
 </projectDescription>
