@@ -82,7 +82,7 @@ void pulseClock() {
 }
 
 /* Configures the shift registers to be used */
-void configureShiftPins() {
+void configure_shift_pins() {
     P4->SEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P3->SEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 
@@ -176,7 +176,7 @@ void updateHours(uint8_t value) {
 
 /* updates hours, minutes, and seconds all at once */
 void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
-    P4->OUT &= ~(BIT1); // Put latch low
+    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
 
     uint8_t segHrsOne = decToSevSeg(decHrs / 10);
     uint8_t segHrsTwo = decToSevSeg(decHrs % 10);
@@ -195,25 +195,15 @@ void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     shiftOut(5, segSecsOne);
     shiftOut(6, segSecsTwo);
 
-    P4->OUT |= BIT1;    // set latch !SRCLR high
+    P4->OUT |= BIT1;    // set latch (!SRCLR0 high again
 }
 
 /* places a value in the shift register */
 void shiftOut(uint8_t tubeNumber, uint8_t val) {
-    //P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
-
     uint8_t i;
     for(i = 0; i < 8; i++) {
-//        assignPin(1, (val & (1 << i))); // P4.2 (SER) for tube 1
-
         assignPin(tubeNumber+1, (val & (1 << i))); // P4.2 (SER) for tube 1
-
-        P4->OUT ^= BIT2; // test value
+//        P4->OUT ^= BIT2; // test value
         pulseClock(); // P4.0
-        P4->OUT |= BIT0;
-        P4->OUT ^= BIT0;
     }
-//    P4->OUT |= BIT1; // latch
-//    P4->OUT &= ~(BIT1); // latch
-
 }

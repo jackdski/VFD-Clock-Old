@@ -27,7 +27,7 @@ void enableOutput(uint8_t target);
 void pulseClock();
 
 /* Configures the shift registers to be used */
-void configureShiftPins();
+void configure_shift_pins();
 
 /* returns a value that will show the input value
  * in the uint8_t on 7-seg display */
