@@ -8,15 +8,6 @@
 #include "msp.h"
 #include <stdint.h>
 
-/* timer used for shift register delays */
-void enableSystick(uint16_t microseconds);
-
-/* disable the delay timer */
-void disableSystick();
-
-/* disable the delay timer after it counts down all the way */
-void SysTick_Handler();
-
 /* 1-6 for select tubes, 7 for all */
 void disableOutput(uint8_t target);
 
@@ -40,7 +31,7 @@ void assignPin(uint8_t tube, uint8_t val);
 void updateSeconds(uint8_t value);
 
 /* updates only the two tubes related to minutes */
-void updateMinutes(uint8_t value);
+void updateMinutes(uint8_t minsValue, uint8_t secsValue);
 
 /* updates only the two tubes related to seconds */
 void updateHours(uint8_t value);

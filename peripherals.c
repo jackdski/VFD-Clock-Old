@@ -9,11 +9,15 @@
 #include "rtc.h"
 #include <stdint.h>
 #include "tubes.h"
+#include "timer.h"
 
 //extern Mode state;
 extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
+
+extern uint8_t doButtons;
+extern uint8_t buttonCount;
 
 // configure on P3.2 and P3.3 to be used for UART, if necessary
 void configure_uart(){
@@ -48,9 +52,10 @@ void configure_buttons() {
     P5->SEL1 &= ~(BIT0 | BIT1 | BIT2);
 
     // config switch and +/- buttons direction and pulldown resistor
-    P5->DIR &= ~(BIT1 | BIT4 | BIT5);  // put to input direction
-    P5->REN |= (BIT1 | BIT4 | BIT5);    // enable pullup/down resistor
-    P5->OUT &= ~(BIT1 | BIT4 | BIT5);   // enable pulldown resistor
+    P5->DIR &= ~(BIT0 | BIT1 | BIT4 | BIT5);  // put to input direction
+    P5->REN |= (BIT0 | BIT1 | BIT4 | BIT5);    // enable pullup/down resistor
+    P5->OUT &= ~(BIT0 | BIT1 | BIT4 | BIT5);   // enable pulldown resistor
+    P5->IE |= (BIT1 | BIT2);
 
     NVIC_EnableIRQ(PORT5_IRQn);
 }
@@ -91,24 +96,41 @@ void configure_all_pins() {
 // +/- control
 void PORT5_IRQHandler() {
     // "+" Button
-    if(P5->IFG & BIT1) {
-        seconds = 0;
-        minutes += 1;
-//        update_tubes(hours, minutes, seconds);
-        updateTime(hours, minutes, seconds);
-    }
-    else {
-        return;
+    if(P5->IFG & BIT1 && P5->IN & BIT0) {
+        // if rising edge
+        if(P5->IES & BIT1) {
+            P5->IES &= ~BIT1; // set to falling edge
+            doButtons = 0b01;
+            enableSystick(50); // set to 50ms
+        }
+
+        // if falling edge
+        else if(P5->IES & ~BIT1) {
+            P5->IES &= BIT1; // set to rising edge
+            doButtons = 0b10;
+            disableSystick();
+            RTCSEC = 0;
+            buttonCount = 0; // reset button count
+        }
     }
 
     // "-" Button
-    if(P5->IFG & BIT2) {
-        seconds = 0;
-        minutes -= 1;
-//        update_tubes(hours, minutes, seconds);
-        updateTime(hours, minutes, seconds);
+    if(P5->IFG & BIT2 && P5->IN & BIT0) {
+        // if rising edge
+        if(P5->IES & BIT2) {
+            P5->IES &= ~BIT2; // set to falling edge
+            doButtons = 0b00010000;
+            enableSystick(50); // set to 50ms
+        }
+
+        // if falling edge
+        else if(P5->IES & ~BIT2) {
+            P5->IES &= BIT2; // set to rising edge
+            doButtons = 0b10010000;
+            disableSystick();
+            RTCSEC = 0;
+            buttonCount = 0; // reset button count
+        }
     }
-    else {
-        return;
-    }
+    P5->IFG = 0; // clear interrupt flags
 }

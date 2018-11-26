@@ -18,6 +18,8 @@ peripherals.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 peripherals.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
 peripherals.obj: ../rtc.h
 peripherals.obj: ../tubes.h
+peripherals.obj: ../timer.h
+peripherals.obj: ../tubes.h
 
 ../peripherals.c: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -36,4 +38,6 @@ peripherals.obj: ../tubes.h
 /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
 ../rtc.h: 
+../tubes.h: 
+../timer.h: 
 ../tubes.h: 

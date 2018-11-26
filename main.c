@@ -24,16 +24,22 @@ volatile uint8_t onOff = 1;         // 0 = blanks, 1 = current time
 volatile uint8_t setupChanged = 0;  // for setup mode
 volatile uint8_t timeChanged;   // 1 if RTC changes value
 
+
+// 0b0000_0001=do + button, 0b0001_0000=do - button
+// 0b1000 = increment hours, 0b0000 = increment minutes
+volatile uint8_t doButtons = 0;
+volatile uint8_t buttonCount = 0;
+
 void main(void) {
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
 
     // configure pins
 //	configure_all_pins();
 //	configure_rtc();
-	configure_uart();
+//	configure_uart();
 	configure_buttons();
 	configure_shift_pins();
-	configure_setup_timer();
+//	configure_setup_timer();
 
 	__enable_irq();
 
@@ -45,69 +51,48 @@ void main(void) {
 
 
 	/* SETUP START */
-
-	/* SETUP LOOP - flashes until switch is moved to the SETUP position */
-	/* MAY NOT BE NEEDED IF RTC SAVES OLD TIME */
-//	while(!(P5->IN & BIT0)) { // actual loop
-//	while(1) { // for testing just this loop
-//	    TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // turn on timer interrupts
-//        if(setupChanged) {
-//            showTimeSetUp(onOff);
-//            onOff ^= 1;
-//            setupChanged = 0;
-//        }
-//    }
     updateTime(hours, minutes, seconds);
     configure_rtc();    // now config RTC
-
 	/* SETUP END */
 
 	/* MAIN LOOP */
 	while(1) {
-//	     NORMAL position - switch is LOW so run normal clock loop
-	    if( !(P5->IN & BIT0) ) {
-//            seconds = RTCSEC;
-//            // make sure hrs, mins, and secs increments correctly
-//            if(seconds == 0) {
-//                if(minutes == 60) {
-//                    minutes = 0;
-//                    if(hours == 13) {
-//                        hours = 0;
-//                    }
-//                    else {
-//                        hours++;
-//                    }
-//                }
-//                else {
-//                    minutes++;
-//                    P1->OUT ^= BIT0;
-//                }
-//            }
-//            // blink light at 1Hz
-//            if(seconds % 2 == 0) {
-//                P1->OUT |= BIT0;
-//            }
-//            if(seconds % 2 != 0) {
-//                P1->OUT &= ~BIT0;
-//            }
-//
-//            // load newly calculated time to the displays
-	        if( timeChanged ) {
-	            updateTime(hours, minutes, seconds);
-	            timeChanged = 0;
-	        }
-	        // else: don't change anything
-	    }
-
 	    // SETUP position - switch is HIGH so run time-picking mode
 	    if( P5->IN & BIT0 ) {
-	        uint32_t i;
-	        for(i = 0; i < 25000; i++);
-	        P1->OUT ^= BIT0;
-	        // alternate between displaying the current time and blanks
-	        if(setupChanged)
-	            showTimeSetUp(onOff);
-	            setupChanged = 0;
+	        // if not disabled already, disable RTC interrupts
+            if(NVIC->ISER[(((uint32_t)(int32_t)RTC_C_IRQn) >> 5UL)] !=
+                    (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {
+                NVIC_DisableIRQ(RTC_C_IRQn);
+            }
+
+            // if + button is pressed
+            if(doButtons &= 0b1) {
+                if(buttonCount >= 10)
+                    doButtons = 0b1001;
+            }
+            // if - button is pressed
+            if(doButtons &= 0x10) {
+                if(buttonCount >= 10)
+                    doButtons = 0b10010000;
+            }
+
+            // update tubes
+            if(RTCCTL13 & RTC_C_CTL13_RDY) { // if safe for reading
+                updateTime(RTCHOUR, RTCMIN, RTCSEC);
+            }
+
+	        P1->OUT |= BIT0;
+	    }
+	    // NORMAL position - waits for interrupts
+	    else {
+	        // if not enabled already, enable RTC interrupts
+	        if(NVIC->ISER[(((uint32_t)(int32_t)RTC_C_IRQn) >> 5UL)] ==
+	                (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {
+	            NVIC_EnableIRQ(RTC_C_IRQn);
+	            buttonCount = 0; // reset button counter too
+	        }
+
+	        P1->OUT &= ~BIT0;
 	    }
 	}
 }

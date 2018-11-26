@@ -39,21 +39,6 @@
 #define TUBE_5_SER      6   // Seconds 1
 #define TUBE_6_SER      7   // Seconds 2
 
-/* timer used for shift register delays */
-void enableSystick(uint16_t microseconds) {
-    SysTick->LOAD = 3 * microseconds;;
-    SysTick->CTRL = BIT0 | BIT1 | BIT2; // enable bits
-}
-
-/* disable the delay timer */
-void disableSystick() {
-    SysTick->CTRL &= ~(BIT0 | BIT1 | BIT2);
-}
-
-/* disable the delay timer after it counts down all the way */
-void SysTick_Handler() {
-    SysTick->CTRL &= ~(BIT0 | BIT1 | BIT2); // disable SysTick
-}
 
 /* 1-6 for select tubes, 7 for all */
 void disableOutput(uint8_t target) {
@@ -127,51 +112,34 @@ void assignPin(uint8_t tube, uint8_t val) {
 }
 
 /* updates only the two tubes related to seconds */
-void updateSeconds(uint8_t value) {
-    P4->OUT &= ~(BIT1); // latch
+void updateSeconds(uint8_t decSecs) {
+    uint8_t segSecsOne = decToSevSeg(decSecs / 10);
+    uint8_t segSecsTwo = decToSevSeg(decSecs % 10);
 
-    uint8_t secsOne = decToSevSeg(value / 10);
-    uint8_t secsTwo = decToSevSeg(value % 10);
+    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
 
-    uint8_t i;
-    for(i = 0; i < 8; i++) {
-        assignPin(5, (secsOne & (1 << i)));
-        assignPin(6, (secsTwo & (1 << i)));
-        pulseClock();
-    }
-    P4->OUT |= BIT1;
-    P4->OUT &= ~BIT1;
+    shiftOut(5, segSecsOne);
+    shiftOut(6, segSecsTwo);
+
+    P4->OUT |= BIT1;    // set latch (!SRCLR0) high again
 }
 
 /* updates only the two tubes related to minutes */
-void updateMinutes(uint8_t value) {
-    P4->OUT &= ~(BIT1); // latch
+void updateMinutes(uint8_t decMins, uint8_t decSecs) {
+    uint8_t segMinsOne = decToSevSeg(decMins / 10);
+    uint8_t segMinsTwo = decToSevSeg(decMins % 10);
+    uint8_t segSecsOne = decToSevSeg(decSecs / 10);
+    uint8_t segSecsTwo = decToSevSeg(decSecs % 10);
 
-    uint8_t minsOne = decToSevSeg(value / 10);
-    uint8_t minsTwo = decToSevSeg(value % 10);
-    uint8_t i;
-    for(i = 0; i < 8; i++) {
-        assignPin(5, (minsOne & (1 << i)));
-        assignPin(6, (minsTwo & (1 << i)));
-        pulseClock();
-    }
-    P4->OUT |= BIT1;
-    P4->OUT &= ~BIT1;
-}
+    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
 
-/* updates only the two tubes related to seconds */
-void updateHours(uint8_t value) {
-    P4->OUT &= ~(BIT1); // latch
-    uint8_t hrsOne = decToSevSeg(value / 10);
-    uint8_t hrsTwo = decToSevSeg(value % 10);
-    uint8_t i;
-    for(i = 0; i < 8; i++) {
-        assignPin(5, (hrsOne & (1 << i)));
-        assignPin(6, (hrsTwo & (1 << i)));
-        pulseClock();
-    }
-    P4->OUT |= BIT1;
-    P4->OUT &= ~BIT1;
+    // write the values to the tubes
+    shiftOut(3, segMinsOne);
+    shiftOut(4, segMinsTwo);
+    shiftOut(5, segSecsOne);
+    shiftOut(6, segSecsTwo);
+
+    P4->OUT |= BIT1;    // set latch (!SRCLR0) high again
 }
 
 /* updates hours, minutes, and seconds all at once */
@@ -195,7 +163,7 @@ void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     shiftOut(5, segSecsOne);
     shiftOut(6, segSecsTwo);
 
-    P4->OUT |= BIT1;    // set latch (!SRCLR0 high again
+    P4->OUT |= BIT1;    // set latch (!SRCLR0) high again
 }
 
 /* places a value in the shift register */
