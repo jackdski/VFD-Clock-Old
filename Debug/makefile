@@ -8,6 +8,7 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./circbuf.obj" \
 "./main.obj" \
 "./peripherals.obj" \
 "./rtc.obj" \
@@ -158,8 +159,8 @@ VFD-Clock.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "peripherals.obj" "rtc.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "timer.obj" "tubes.obj" 
-	-$(RM) "main.d" "peripherals.d" "rtc.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "timer.d" "tubes.d" 
+	-$(RM) "circbuf.obj" "main.obj" "peripherals.obj" "rtc.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "timer.obj" "tubes.obj" 
+	-$(RM) "circbuf.d" "main.d" "peripherals.d" "rtc.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "timer.d" "tubes.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

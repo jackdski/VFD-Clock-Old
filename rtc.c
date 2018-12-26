@@ -11,7 +11,7 @@
 extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
-extern uint8_t timeChanged;
+//extern uint8_t timeChanged;
 
 void configure_rtc() {
 //    RTC_C->CTL0 = RTC_C_KEY;
@@ -30,7 +30,8 @@ void configure_rtc() {
 }
 
 void RTC_C_IRQHandler() {
-    if(RTCCTL0_L & RTC_C_CTL0_RDYIFG) { // if correct interrupt
+    // if ready to read from
+//    if(RTCCTL0_L & RTC_C_CTL0_RDYIFG) { // if correct interrupt
 //        P2->OUT |= BIT0; // test to see if interrupt happened
 //        if(RTCCTL13 & RTC_C_CTL13_RDY) { // if safe for reading
 //            // update values to be loaded
@@ -40,36 +41,39 @@ void RTC_C_IRQHandler() {
 //            timeChanged = 1;
 //        }
         // update time
-    }
+//    }
 
     uint8_t changes = 0;
 
     // second was changed
     if (RTC_C->PS1CTL & RTC_C_PS1CTL_RT1PSIFG) {
-        P2->OUT ^= BIT2;
         RTC_C->PS1CTL & ~RTC_C_PS1CTL_RT1PSIFG; // clear flag
-        changes |= 0x001;
+        changes |= 0b001;
+        P2->OUT ^= BIT2;
     }
 
     // minute was changed
-    if(RTCCTL13_L & RTC_C_CTL13_TEV_0) {
-        changes |= 0x011;
-    }
-    if(RTCCTL13_L & RTC_C_CTL13_TEV_1) {
-        changes |= 0x111;
-    }
+    if(RTCCTL13_L & RTC_C_CTL13_TEV_0)
+        changes |= 0b011;
 
-    // now update tubes
-    switch(changes) {
-    case 0x001:
-        updateSeconds(RTCSEC);
-        break;
-    case 0x011:
-        updateMinutes(RTCMIN, RTCSEC);
-        break;
-    case 0x111:
-        updateTime(RTCHOUR, RTCMIN, RTCSEC);
-        break;
+    // hour was changed
+    if(RTCCTL13_L & RTC_C_CTL13_TEV_1)
+        changes |= 0b111;
+
+    // if able to read update tubes
+    if(RTCCTL0_L & RTC_C_CTL0_RDYIFG) {
+        // now update tubes
+        switch(changes) {
+        case 0b001:
+            updateSeconds(RTCSEC);
+            break;
+        case 0b011:
+            updateMinutes(RTCMIN, RTCSEC);
+            break;
+        case 0b111:
+            updateTime(RTCHOUR, RTCMIN, RTCSEC);
+            break;
+        }
     }
 
 //    RTCCTL0_L &=  !RTC_C_CTL0_RDYIFG;// clear interrupt flag?

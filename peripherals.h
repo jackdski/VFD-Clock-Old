@@ -12,9 +12,13 @@
 #include "rtc.h"
 #include "tubes.h"
 
+void configure_SystemClock();
+
 void configure_uart();
 
 void configure_buttons();
+
+void configure_leds();
 
 void configure_all_pins();
 

@@ -16,8 +16,8 @@ extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
 
-extern uint8_t onOff; // 0 = blanks, 1 = current time
-extern uint8_t setupChanged;
+//extern uint8_t onOff; // 0 = blanks, 1 = current time
+//extern uint8_t setupChanged;
 
 extern uint8_t doButtons;
 extern uint8_t buttonCount;
@@ -37,11 +37,11 @@ void disableSystick() {
 /* disable the timer after it counts down all the way */
 void SysTick_Handler() {
     buttonCount++; // increment
-    if(doButtons == 0b00001001)
+    if(doButtons == 0b00001001) // 0x09
         RTCHOUR++;
-    else if(doButtons == 0b00000001)
+    else if(doButtons == 0b00000001) // 0x01
         RTCMIN++;
-    else if(doButtons == 0b10010000)
+    else if(doButtons == 0b10010000) // 0x90
         RTCHOUR--;
     else if(doButtons == 0b00010000)
         RTCMIN--;
@@ -75,16 +75,16 @@ void SysTick_Handler() {
 //}
 
 /* Will display a time or blanks depending on the input */
-void showTimeSetUp(uint8_t onOff) {
-    if( onOff == 1 ) {
-        // display current time
-        updateTime(hours, minutes, seconds);
-//        onOff = 0;
-    }
-    else if( onOff == 0 ) {
-        // dislay blanks
-        updateTime(0, 0, 0);
-//        onOff = 1;
-    }
+//void showTimeSetUp(uint8_t onOff) {
+//    if( onOff == 1 ) {
+//        // display current time
+//        updateTime(hours, minutes, seconds);
+////        onOff = 0;
+//    }
+//    else if( onOff == 0 ) {
+//        // dislay blanks
+//        updateTime(0, 0, 0);
+////        onOff = 1;
+//    }
 //    P2->OUT ^= BIT1;
-}
+//}

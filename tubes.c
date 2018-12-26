@@ -32,12 +32,12 @@
  *  Pin numbers on Port 4 that connect to the
  *  serial pin of the shift register
  */
-#define TUBE_1_SER      2   // Hours 1
-#define TUBE_2_SER      3   // Hours 2
-#define TUBE_3_SER      4   // Minutes 1
-#define TUBE_4_SER      5   // Minutes 2
-#define TUBE_5_SER      6   // Seconds 1
-#define TUBE_6_SER      7   // Seconds 2
+//#define TUBE_1_SER      2   // Hours 1
+//#define TUBE_2_SER      3   // Hours 2
+//#define TUBE_3_SER      4   // Minutes 1
+//#define TUBE_4_SER      5   // Minutes 2
+//#define TUBE_5_SER      6   // Seconds 1
+//#define TUBE_6_SER      7   // Seconds 2
 
 
 /* 1-6 for select tubes, 7 for all */

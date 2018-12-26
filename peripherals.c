@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "tubes.h"
 #include "timer.h"
+#include "circbuf.h"
 
 //extern Mode state;
 extern uint8_t hours;
@@ -19,7 +20,23 @@ extern uint8_t seconds;
 extern uint8_t doButtons;
 extern uint8_t buttonCount;
 
-// configure on P3.2 and P3.3 to be used for UART, if necessary
+extern CircBuf_t * RXBuf;
+extern CircBuf_t * TXBuf;
+
+
+
+void configure_SystemClock(){
+    CS-> KEY = 0x695A; //Unlock module for register access
+    CS-> CTL0 = 0;     //Reset tuning parameters
+    CS-> CTL0 = (BIT(23) | CS_CTL0_DCORSEL_3);     //Setup DCO Clock
+
+    //Select ACLO = REFO, SMCLK MCLK = DCO
+    CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3;
+    CS->KEY = 0;       //Lock CS module for register access.
+}
+
+// configure on P1.2 (RX) and P1.3 (TX) to be used for
+//  Bluetooth UART communication
 void configure_uart(){
     //Configure UART pins, set 2-UART pins to UART mode
     P1->SEL0 |=  (BIT2 | BIT3);
@@ -41,12 +58,6 @@ void configure_buttons() {
     // P5.1 -> '+' Button
     // P5.2 -> '-' Button
 
-    // config LED
-    P1->SEL0 &= ~(BIT0);
-    P1->SEL1 &= ~(BIT0);
-    P1->DIR |=  (BIT0);
-    P1->OUT &= ~(BIT0);
-
     // config switch and button SEL reg's
     P5->SEL0 &= ~(BIT0 | BIT1 | BIT2);
     P5->SEL1 &= ~(BIT0 | BIT1 | BIT2);
@@ -60,36 +71,50 @@ void configure_buttons() {
     NVIC_EnableIRQ(PORT5_IRQn);
 }
 
+void configure_leds() {
+    // config LED
+    P1->SEL0 &= ~(BIT0);
+    P1->SEL1 &= ~(BIT0);
+    P1->DIR |=  (BIT0);
+    P1->OUT &= ~(BIT0);
+
+    // Config Port 2 LED for debugging help
+    P2->SEL0 &= ~(BIT0 | BIT1 | BIT2);
+    P2->SEL1 &= ~(BIT0 | BIT1 | BIT2);
+    P2->DIR |= (BIT0 | BIT1 | BIT2);
+    P2->OUT &= ~(BIT0 | BIT1 | BIT2);
+}
+
 /* set all unused pins to low for power reasons */
 void configure_all_pins() {
-    P1->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P1->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P1->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P2->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P2->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P2->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P3->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P3->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P3->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P4->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P4->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P4->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P5->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P5->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P5->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P6->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P6->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P6->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P7->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P7->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P7->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P8->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P8->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P8->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P9->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P9->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P9->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
-    P10->DIR &=  ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
+    P10->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
     P10->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 }
 
@@ -133,4 +158,20 @@ void PORT5_IRQHandler() {
         }
     }
     P5->IFG = 0; // clear interrupt flags
+}
+
+// UART interrupts
+void EUSCIA0_IRQHandler(){
+    if (EUSCI_A0->IFG & BIT0){
+        addItemCircBuf(RXBuf, EUSCI_A0->RXBUF);
+    }
+    if (EUSCI_A0->IFG & BIT1){
+        //Transmit Stuff
+        if(isEmpty(TXBuf)) {
+            EUSCI_A0->IFG &= ~BIT1;
+            return;
+        }
+//        sendByte(removeItem(TXBuf));
+        EUSCI_A0->TXBUF = removeItem(TXBuf);
+    }
 }
