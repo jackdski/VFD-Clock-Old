@@ -145,7 +145,7 @@ all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 VFD-Clock.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
-	"/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --advice:power=all --define=__MSP432P401R__ --define=ccs -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"VFD-Clock.map" --heap_size=1024 --stack_size=512 -i"/home/jack/ti/ccsv8/ccs_base/arm/include" -i"/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/lib" -i"/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="VFD-Clock_linkInfo.xml" --rom_model -o "VFD-Clock.out" $(ORDERED_OBJS)
+	"/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -O0 --opt_for_speed=4 --advice:power=all --define=__MSP432P401R__ --define=ccs -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"VFD-Clock.map" --heap_size=1024 --stack_size=512 -i"/home/jack/ti/ccsv8/ccs_base/arm/include" -i"/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/lib" -i"/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="VFD-Clock_linkInfo.xml" --rom_model -o "VFD-Clock.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 

@@ -5,6 +5,12 @@
  *  main.c
  */
 
+#define     MAIN /* runs main loop */
+#define     RUN_SETUP /* runs setup on startup */
+//#define     SHIFT_REG_TEST  // displays 0-9 continuously
+//#define     UART_TEST       // if a msg is properly receive light an LED
+//#define     BUTTONS_TEST    // '+' = blue light toggle, '-' = green light toggle
+
 #include "msp.h"
 #include "rtc.h"
 #include "tubes.h"
@@ -53,10 +59,8 @@ void main(void) {
 	__enable_irq();
 
 
-	/* SETUP START */
     updateTime(hours, minutes, seconds);
     configure_rtc();    // now config RTC
-	/* SETUP END */
 
 	/* MAIN LOOP */
 	while(1) {
@@ -64,7 +68,7 @@ void main(void) {
 	    if( P1->IN & BIT4 ) {
 	        if( isFullCircBuf(RXBuf) ) {
                 uint8_t str[8];
-                uint8_t i = 0;
+                int i = 0;
                 for(i=0; i < 8; i++) {
                     str[i] = removeItem(RXBuf) - 48;
                 }
@@ -88,6 +92,16 @@ void main(void) {
                     if(!(isEmpty((CircBuf_t *)TXBuf))) {
                         EUSCI_A0->IFG |= BIT1;
                     }
+                }
+                if( (hours == 1) && (minutes == 2) && (seconds == 3) ) {
+                    // light up green light
+                    P2->OUT &= ~(BIT0 | BIT2);
+                    P2->OUT |= BIT1;
+                }
+                else {
+                    // light up red light
+                    P2->OUT &= ~(BIT1 | BIT2);
+                    P2->OUT |= BIT0;
                 }
                 resetCircBuf((CircBuf_t *)RXBuf);
 	        }
@@ -119,9 +133,9 @@ void main(void) {
             if(RTCCTL13 & RTC_C_CTL13_RDY) { // if safe for reading
                 updateTime(RTCHOUR, RTCMIN, RTCSEC);
             }
-
 	        P1->OUT |= BIT0; // indicate SETUP
 	    }
+
 	    // NORMAL position - waits for interrupts
 	    else { // !(P5->IN & BIT0)
 	        // if not enabled already, enable RTC interrupts

@@ -31,17 +31,17 @@ void configure_rtc() {
 
 void RTC_C_IRQHandler() {
     // if ready to read from
-//    if(RTCCTL0_L & RTC_C_CTL0_RDYIFG) { // if correct interrupt
-//        P2->OUT |= BIT0; // test to see if interrupt happened
-//        if(RTCCTL13 & RTC_C_CTL13_RDY) { // if safe for reading
-//            // update values to be loaded
-//            hours = RTCHOUR;
-//            minutes = RTCMIN;
-//            seconds = RTCSEC;
+    if(RTCCTL0_L & RTC_C_CTL0_RDYIFG) { // if correct interrupt
+        P2->OUT |= BIT0; // test to see if interrupt happened
+        if(RTCCTL13 & RTC_C_CTL13_RDY) { // if safe for reading
+            // update values to be loaded
+            hours = RTCHOUR;
+            minutes = RTCMIN;
+            seconds = RTCSEC;
 //            timeChanged = 1;
-//        }
-        // update time
-//    }
+        }
+         //update time
+    }
 
     uint8_t changes = 0;
 
