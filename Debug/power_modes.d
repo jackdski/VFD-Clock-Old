@@ -1,0 +1,43 @@
+# FIXED
+
+power_modes.obj: ../power_modes.c
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/msp.h
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/msp432p401r.h
+power_modes.obj: /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/stdint.h
+power_modes.obj: /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/stdint.h
+power_modes.obj: /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/cdefs.h
+power_modes.obj: /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/_types.h
+power_modes.obj: /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/machine/_types.h
+power_modes.obj: /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/machine/_stdint.h
+power_modes.obj: /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/_stdint.h
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/msp_compatibility.h
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/msp432p401r_classic.h
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
+power_modes.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
+power_modes.obj: ../rtc.h
+power_modes.obj: ../timer.h
+power_modes.obj: ../tubes.h
+power_modes.obj: ../power_modes.h
+
+../power_modes.c: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/msp.h: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/msp432p401r.h: 
+/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/stdint.h: 
+/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/stdint.h: 
+/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/cdefs.h: 
+/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/_types.h: 
+/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/machine/_types.h: 
+/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/machine/_stdint.h: 
+/home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/include/sys/_stdint.h: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/msp_compatibility.h: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/msp432p401r_classic.h: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
+/home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
+../rtc.h: 
+../timer.h: 
+../tubes.h: 
+../power_modes.h: 
