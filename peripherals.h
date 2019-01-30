@@ -9,8 +9,11 @@
 #define PERIPHERALS_H_
 
 #include "msp.h"
-#include "rtc.h"
-#include "tubes.h"
+
+typedef enum SwitchMode {
+    Normal = 0,
+    Setup  = 1
+}SwitchMode;
 
 void configure_SystemClock();
 

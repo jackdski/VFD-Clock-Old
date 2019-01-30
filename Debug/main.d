@@ -19,7 +19,6 @@ main.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
 main.obj: ../rtc.h
 main.obj: ../tubes.h
 main.obj: ../peripherals.h
-main.obj: ../tubes.h
 main.obj: ../timer.h
 main.obj: ../tubes.h
 main.obj: ../circbuf.h
@@ -43,7 +42,6 @@ main.obj: ../circbuf.h
 ../rtc.h: 
 ../tubes.h: 
 ../peripherals.h: 
-../tubes.h: 
 ../timer.h: 
 ../tubes.h: 
 ../circbuf.h: 
