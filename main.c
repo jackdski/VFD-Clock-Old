@@ -43,108 +43,28 @@ volatile uint8_t buttonCount = 0;
 void main(void) {
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
 
-	// create circular buffer for Bluetooth comm
-    RXBuf = createCircBuf(8);
-    TXBuf = createCircBuf(16);
-
     // configuration function calls
 	configure_all_pins();
 	configure_SystemClock();
-	configure_rtc();
-	configure_uart();
-	configure_buttons();
+//	configure_rtc();
+//	configure_uart();
+//	configure_buttons();
 	configure_leds();
 	configure_shift_pins();
 
 	__enable_irq();
-
 
     updateTime(hours, minutes, seconds);
     configure_rtc();    // now config RTC
 
 	/* MAIN LOOP */
 	while(1) {
-	    // BLUETOOTH SETUP mode
-	    if( P1->IN & BIT4 ) {
-	        if( isFullCircBuf(RXBuf) ) {
-                uint8_t str[8];
-                int i = 0;
-                for(i=0; i < 8; i++) {
-                    str[i] = removeItem(RXBuf) - 48;
-                }
-
-                if(str[0] == '<' && str[7] == '>' ){
-                    // take RXBuf items and convert from ASCII to decimal
-                    hours = str[1] + str[2];
-                    minutes = str[3] + str[4];
-                    seconds = str[5] + str[6];
-                    updateTime(hours, minutes, seconds);
-                }
-                else {  // print error message to try again
-                    uint8_t * string = "ERROR...\n";
-                    loadToBuf(TXBuf, string, 9);
-                    if(!(isEmpty((CircBuf_t *)TXBuf))) {
-                        EUSCI_A0->IFG |= BIT1;
-                    }
-
-                    string = "Try again...\n";
-                    loadToBuf(TXBuf, string, 13);
-                    if(!(isEmpty((CircBuf_t *)TXBuf))) {
-                        EUSCI_A0->IFG |= BIT1;
-                    }
-                }
-                if( (hours == 1) && (minutes == 2) && (seconds == 3) ) {
-                    // light up green light
-                    P2->OUT &= ~(BIT0 | BIT2);
-                    P2->OUT |= BIT1;
-                }
-                else {
-                    // light up red light
-                    P2->OUT &= ~(BIT1 | BIT2);
-                    P2->OUT |= BIT0;
-                }
-                resetCircBuf((CircBuf_t *)RXBuf);
-	        }
-	    }
-
-	    // MANUAL SETUP position - switch is HIGH so run time-picking mode
-	    if( P5->IN & BIT0 ) {
-	        // turn on setup indication LED
-	        P1->OUT |= BIT0;
-
-	        // if not disabled already, disable RTC interrupts
-            if(NVIC->ISER[(((uint32_t)(int32_t)RTC_C_IRQn) >> 5UL)] !=
-                    (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {
-                NVIC_DisableIRQ(RTC_C_IRQn);
-            }
-
-            // if + button is pressed
-            if(doButtons &= 0b1) {
-                if(buttonCount >= 10)
-                    doButtons = 0b1001;
-            }
-            // if - button is pressed
-            if(doButtons &= 0x10) {
-                if(buttonCount >= 10)
-                    doButtons = 0b10010000;
-            }
-
-            // update tubes if safe for reading (necessary to check?)
-            if(RTCCTL13 & RTC_C_CTL13_RDY) { // if safe for reading
-                updateTime(RTCHOUR, RTCMIN, RTCSEC);
-            }
-	        P1->OUT |= BIT0; // indicate SETUP
-	    }
-
-	    // NORMAL position - waits for interrupts
-	    else { // !(P5->IN & BIT0)
-	        // if not enabled already, enable RTC interrupts
-	        if(NVIC->ISER[(((uint32_t)(int32_t)RTC_C_IRQn) >> 5UL)] ==
-	                (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {
-	            NVIC_EnableIRQ(RTC_C_IRQn);
-	            buttonCount = 0; // reset button counter too
-	        }
-	        P1->OUT &= ~BIT0; // indicate NORMAL
-	    }
+        // if not enabled already, enable RTC interrupts
+        if(NVIC->ISER[(((uint32_t)(int32_t)RTC_C_IRQn) >> 5UL)] ==
+                (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {
+            NVIC_EnableIRQ(RTC_C_IRQn);
+            buttonCount = 0; // reset button counter too
+        }
+        P1->OUT &= ~BIT0; // indicate NORMAL
 	}
 }

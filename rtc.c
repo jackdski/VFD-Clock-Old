@@ -40,7 +40,6 @@ void RTC_C_IRQHandler() {
             seconds = RTCSEC;
 //            timeChanged = 1;
         }
-         //update time
     }
 
     uint8_t changes = 0;
@@ -75,7 +74,6 @@ void RTC_C_IRQHandler() {
             break;
         }
     }
-
 //    RTCCTL0_L &=  !RTC_C_CTL0_RDYIFG;// clear interrupt flag?
     RTCIV &= 0x00; // clear interrupt
 }
