@@ -106,26 +106,35 @@ void configure_i2c(){
 }
 
 void write_i2c(uint8_t reg, uint8_t val) {
-    addItemCircBuf(TXBuf_i2c, reg);
-    addItemCircBuf(TXBuf_i2c, val);
+//    addItemCircBuf(TXBuf_i2c, reg);
+//    addItemCircBuf(TXBuf_i2c, val);
 //    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_SWRST;     // enable
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write/transmitter
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
-    EUSCI_B0->IFG |= EUSCI_B_IFG_TXIFG0;        // send
-    // block?
+//    EUSCI_B0->IFG |= EUSCI_B_IFG_TXIFG0;        // send
+    EUSCI_B0->TXBUF = reg;
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);// block?
+    EUSCI_B0->TXBUF = val;
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;     // send stop
 //    EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_SWRST);  // disable
 }
 
 void read_i2c(uint8_t msg, uint8_t bytes) {
 //    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_SWRST;     // enable
-    EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_TR);     // set to receiver
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write/transmitter
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
-    addItemCircBuf(TXBuf_i2c, msg);             // load msg
-    EUSCI_B0->IFG |= EUSCI_B_IFG_TXIFG0;        // send msg
-    // block?
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);// block?
+    EUSCI_B0->TXBUF = msg;
+//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;     // send stop
+
+    EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_TR);     // set to receiver
+//    addItemCircBuf(TXBuf_i2c, msg);             // load msg
+//    EUSCI_B0->IFG |= EUSCI_B_IFG_TXIFG0;        // send msg
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send restart
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);// block?
     while(EUSCI_B0->STATW & EUSCI_B_STATW_BCNT_MASK != (bytes << 8)); // read specified amount of bytes
+    //while(!(EUSCI_B0->IFG & )); // get a byte
+//    uint8_t data = EUSCI_B0->RXBUF; // for single byte implementation
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;          // send stop
 //    EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_SWRST);  // disable
 }
@@ -304,13 +313,13 @@ void EUSCIB0_IRQHandler() {
     // transmitting
     if(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0) {
         EUSCI_B0->IFG &= ~(EUSCI_B_IFG_TXIFG0);
-        if(isEmpty(TXBuf_i2c)){                    // if circbuf is empty
-            EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP; // transmit stop message
-            EUSCI_B0->IFG &= ~(EUSCI_B_IFG_TXIFG0); // clear flag
-        }
-        else { // if not empty, send a byte
-            EUSCI_B0->TXBUF = removeItem(TXBuf_i2c); // load what's in buffer
-        }
+//        if(isEmpty(TXBuf_i2c)){                    // if circbuf is empty
+//            EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP; // transmit stop message
+//            EUSCI_B0->IFG &= ~(EUSCI_B_IFG_TXIFG0); // clear flag
+//        }
+//        else { // if not empty, send a byte
+//            EUSCI_B0->TXBUF = removeItem(TXBuf_i2c); // load what's in buffer
+//        }
     }
 
     // receiving
