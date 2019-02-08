@@ -126,7 +126,7 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= ~BIT1; // set to falling edge
                 doButtons = 0b01;
-                enableSystick(50); // set to 50ms
+//                enableSystick(50); // set to 50ms
             }
         }
 
@@ -135,7 +135,7 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= BIT1; // set to rising edge
                 doButtons = 0b10;
-                disableSystick();
+//                disableSystick();
                 RTCSEC = 0;
                 buttonCount = 0; // reset button count
             }
@@ -149,7 +149,7 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= ~BIT2; // set to falling edge
                 doButtons = 0b00010000;
-                enableSystick(50); // set to 50ms
+//                enableSystick(50); // set to 50ms
             }
         }
 
@@ -158,7 +158,7 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= BIT2; // set to rising edge
                 doButtons = 0b10010000;
-                disableSystick();
+//                disableSystick();
                 RTCSEC = 0;
                 buttonCount = 0; // reset button count
             }

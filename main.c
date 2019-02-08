@@ -28,7 +28,7 @@ CircBuf_t * TXBuf;
 CircBuf_t * RXBuf;
 
 //volatile uint8_t onOff = 1;         // 0 = blanks, 1 = current time
-//volatile uint8_t setupChanged = 0;  // for setup mode
+volatile uint8_t setupChanged = 0;  // for setup mode
 //volatile uint8_t timeChanged;   // 1 if RTC changes value
 
 
@@ -43,7 +43,7 @@ void main(void) {
     // configuration function calls
 	configure_all_pins();
 	configure_SystemClock();
-	configure_rtc();
+//	configure_rtc();
 	configure_uart();
 	configure_buttons();
 	configure_leds();
