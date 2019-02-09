@@ -40,6 +40,12 @@ extern CircBuf_t * TXBuf;
 extern CircBuf_t * RXBuf_i2c;
 extern CircBuf_t * TXBuf_i2c;
 
+uint8_t TXData[5];
+//uint8_t RXData[5];
+uint8_t tx_size = 0;
+//uint8_t rx_size = 0;
+
+
 void configure_i2c(){
     /*
      * UCB0SDA -> P1.6
@@ -63,7 +69,7 @@ void configure_i2c(){
 
     EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_SWRST);  // lock
 
-    EUSCI_B0->IE = (EUSCI_B_IE_RXIE | EUSCI_B_IE_TXIE | EUSCI_B_IE_NACKIE); // enable RX, TX, and NACK interrupts
+    EUSCI_B0->IE = (EUSCI_B_IE_RXIE | EUSCI_B_IE_TXIE | EUSCI_B_IE_NACKIE | EUSCI_B_IE_STPIE); // enable RX, TX, and NACK interrupts
     EUSCI_B0->IFG = 0; // clear flags
 //    NVIC_EnableIRQ(EUSCIB0_IRQn);
     NVIC->ISER[0] = 1 << ((EUSCIB0_IRQn) & 31);
@@ -90,24 +96,31 @@ void configure_i2c(){
 //    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;          // send stop
 //}
 
-void write_byte_i2c(uint8_t reg, uint8_t value) {
-    addItemCircBuf(TXBuf_i2c, reg);
-    addItemCircBuf(TXBuf_i2c, value);
+void write_byte_i2c(uint8_t reg) {
+    uint16_t txieStatus = EUSCI_B0->IE & UCTXIE; // store current TXIE status
+    EUSCI_B0->IE &= ~(UCTXIE_OFS);
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
+    EUSCI_B0->IFG |= UCTXIFG;
+    while(EUSCI_B0->IFG & UCTXIFG);
 //    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);
     EUSCI_B0->TXBUF = reg;     // write to reg
+    while(EUSCI_B0->IFG & UCTXIFG);
+    EUSCI_B0->IFG |= UCTXIFG;
+    while(EUSCI_B0->IFG & UCTXIFG);
 //    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));
-    EUSCI_B0->TXBUF = value;   // write to reg
+//    EUSCI_B0->TXBUF = value;   // write to reg
 //    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;  // send stop
+    EUSCI_B0->IFG &= ~UCTXIFG;
+    EUSCI_B0->IE |= txieStatus;
 }
 
 void read_byte_i2c(uint8_t reg){
     addItemCircBuf(TXBuf_i2c, reg);
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
-//    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT); // wait for start and addy to send
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT); // wait for start and addy to send
 //    EUSCI_B0->TXBUF = reg;                      // send data
 //    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));  // wait it to be done sending
     EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_TR);     // set to receiver
@@ -124,13 +137,13 @@ void trigger_sample_mpl() {
     read_byte_i2c(CTRL_REG1);
     uint8_t setting = removeItem(RXBuf_i2c);
     setting &= ~(1 << 1);                   // clear OST bit
-    write_byte_i2c(CTRL_REG1, setting);     // send
+//    write_byte_i2c(CTRL_REG1, setting);     // send
 
     // set OST high again
     read_byte_i2c(CTRL_REG1);
     setting = removeItem(RXBuf_i2c);
     setting |= (1 << 1);        // set OST bit
-    write_byte_i2c(CTRL_REG1, setting);
+//    write_byte_i2c(CTRL_REG1, setting);
 }
 
 uint8_t read_temp_c() {
@@ -167,14 +180,14 @@ void set_mode_standby() {
     read_byte_i2c(CTRL_REG1);
     uint8_t setting = removeItem(RXBuf_i2c);
     setting &= ~(1 << 0);  // clear standby bit
-    write_byte_i2c(CTRL_REG1, setting);
+//    write_byte_i2c(CTRL_REG1, setting);
 }
 
 void set_mode_active() {
     read_byte_i2c(CTRL_REG1);
     uint8_t setting = removeItem(RXBuf_i2c);
     setting |= (1 << 0);  // clear standby bit
-    write_byte_i2c(CTRL_REG1, setting);
+//    write_byte_i2c(CTRL_REG1, setting);
 }
 
 // I2C interrupts
@@ -185,21 +198,35 @@ void EUSCIB0_IRQHandler() {
 //        EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT; // send start message
     }
 
+    if(EUSCI_B0->IFG & EUSCI_B_IFG_STPIFG) {
+        EUSCI_B0->IFG &= ~EUSCI_B_IFG_STPIFG;
+        tx_size = 0;
+    }
+
     // transmitting
     if(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0) {
         EUSCI_B0->IFG &= ~(EUSCI_B_IFG_TXIFG0);  // clear flag
-        if(!isEmpty(TXBuf_i2c)) {
-            EUSCI_B0->TXBUF = removeItem(TXBuf_i2c);
-        }
-        else {
-            EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;
-            EUSCI_B0->IFG &= ~EUSCI_B_IFG_TXIFG;
-        }
+//        if(!isEmpty(TXBuf_i2c)) {
+//            EUSCI_B0->TXBUF = removeItem(TXBuf_i2c);
+//        }
+//        else {
+////            EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;
+////            EUSCI_B0->IFG &= ~EUSCI_B_IFG_TXIFG;
+//            EUSCI_B0->TXBUF = 0; // load dummy byte
+//        }
+//        tx_size++;
     }
 
     // receiving
     if(EUSCI_B0->IFG & EUSCI_B_IFG_RXIFG0) {
         EUSCI_B0->IFG &= ~(EUSCI_B_IFG_RXIFG0);  // clear flag
         addItemCircBuf(RXBuf_i2c, EUSCI_B0->RXBUF);  // throw in RX circbuf
+//        if(rx_size < 5) {
+//            RXData[rx_size] = EUSCI_B0->RXBUF;
+//            rx_size++;
+//        }
+//        if(rx_size > 5) {
+//            rx_size = 0;
+//        }
     }
 }

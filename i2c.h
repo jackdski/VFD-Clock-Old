@@ -27,7 +27,7 @@
 void configure_i2c();
 void write_i2c(uint8_t reg, uint8_t val);
 void read_i2c(uint8_t msg, uint8_t bytes);
-void write_byte_i2c(uint8_t reg, uint8_t value);
+void write_byte_i2c(uint8_t reg);
 void read_byte_i2c(uint8_t reg);
 void trigger_sample_mpl();
 uint8_t read_temp_c();

@@ -67,8 +67,9 @@ void main(void) {
     uint8_t temp;
 	/* MAIN LOOP */
 	while(1) {
-	    temp = read_temp_f();
-	    send_byte(temp); // not sent in ASCII
+//	    temp = read_temp_f();
+//	    send_byte(temp); // not sent in ASCII
+	    write_byte_i2c(0xAA);
 	    int i;
 	    for(i=0;i < 100000; i++);
 	}
