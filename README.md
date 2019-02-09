@@ -1,6 +1,14 @@
 # VFD-Clock
 Firmware files for a VFD Tube Clock
 
+Clean up branches from comments and formatting:
+- [ ] Power Management
+- [ ] Shift Reg
+- [ ] Switchs/Buttons
+- [ ] I2C
+- [ ] UART and SPI
+
+
 Power Management:
 - Goes to sleep:
   - [ ] inbetween RTC updates
