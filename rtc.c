@@ -78,4 +78,6 @@ void RTC_C_IRQHandler() {
 
 //    RTCCTL0_L &=  !RTC_C_CTL0_RDYIFG;// clear interrupt flag?
     RTCIV &= 0x00; // clear interrupt
+
+    enable_low_power_mode(); // sleep
 }

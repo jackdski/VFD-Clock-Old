@@ -15,37 +15,29 @@
 extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
-
-//extern uint8_t onOff; // 0 = blanks, 1 = current time
-//extern uint8_t setupChanged;
-
-extern uint8_t doButtons;
-extern uint8_t buttonCount;
-
-
-/* timer used for button presses */
-void enableSystick(uint16_t microseconds) {
-    SysTick->LOAD = 3 * microseconds;;
-    SysTick->CTRL = BIT0 | BIT1 | BIT2; // enable bits
-}
-
-/* disable the timer */
-void disableSystick() {
-    SysTick->CTRL &= ~(BIT0 | BIT1 | BIT2);
-}
-
-/* disable the timer after it counts down all the way */
-void SysTick_Handler() {
-    buttonCount++; // increment
-    if(doButtons == 0b00001001) // 0x09
-        RTCHOUR++;
-    else if(doButtons == 0b00000001) // 0x01
-        RTCMIN++;
-    else if(doButtons == 0b10010000) // 0x90
-        RTCHOUR--;
-    else if(doButtons == 0b00010000)
-        RTCMIN--;
-}
+//
+///* timer used for button presses */
+//void enableSystick(uint16_t microseconds) {
+//    SysTick->LOAD = 3 * microseconds;;
+//    SysTick->CTRL = BIT0 | BIT1 | BIT2; // enable bits
+//}
+//
+///* disable the timer */
+//void disableSystick() {
+//    SysTick->CTRL &= ~(BIT0 | BIT1 | BIT2);
+//}
+//
+///* disable the timer after it counts down all the way */
+//void SysTick_Handler() {
+//    if(doButtons == 0b00001001) // 0x09
+//        RTCHOUR++;
+//    else if(doButtons == 0b00000001) // 0x01
+//        RTCMIN++;
+//    else if(doButtons == 0b10010000) // 0x90
+//        RTCHOUR--;
+//    else if(doButtons == 0b00010000)
+//        RTCMIN--;
+//}
 
 //void TA0_0_IRQHandler() {
 //

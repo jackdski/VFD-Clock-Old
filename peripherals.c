@@ -17,14 +17,6 @@ extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
 
-extern uint8_t doButtons;
-extern uint8_t buttonCount;
-
-extern CircBuf_t * RXBuf;
-extern CircBuf_t * TXBuf;
-
-
-
 void configure_SystemClock(){
     CS->KEY = 0x695A; //Unlock module for register access
     CS->CTL0 = 0;     //Reset tuning parameters
@@ -32,6 +24,9 @@ void configure_SystemClock(){
 
     //Select ACLO = REFO, SMCLK MCLK = DCO
     CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3;
+
+    CS->CTL2 |= CS_CTL2_LFXTDRIVE_1;
+
     CS->KEY = 0;       //Lock CS module for register access.
 }
 
@@ -119,59 +114,59 @@ void configure_all_pins() {
 }
 
 // +/- control
-void PORT5_IRQHandler() {
-    // "+" Button
-    if(P5->IFG & BIT1 && P5->IN & BIT0) {
-        // if rising edge
-        if(P5->IES & BIT1) {
-            P5->IES &= ~BIT1; // set to falling edge
-            doButtons = 0b01;
-            enableSystick(50); // set to 50ms
-        }
-
-        // if falling edge
-        else if(P5->IES & ~BIT1) {
-            P5->IES &= BIT1; // set to rising edge
-            doButtons = 0b10;
-            disableSystick();
-            RTCSEC = 0;
-            buttonCount = 0; // reset button count
-        }
-    }
-
-    // "-" Button
-    if(P5->IFG & BIT2 && P5->IN & BIT0) {
-        // if rising edge
-        if(P5->IES & BIT2) {
-            P5->IES &= ~BIT2; // set to falling edge
-            doButtons = 0b00010000;
-            enableSystick(50); // set to 50ms
-        }
-
-        // if falling edge
-        else if(P5->IES & ~BIT2) {
-            P5->IES &= BIT2; // set to rising edge
-            doButtons = 0b10010000;
-            disableSystick();
-            RTCSEC = 0;
-            buttonCount = 0; // reset button count
-        }
-    }
-    P5->IFG = 0; // clear interrupt flags
-}
-
-// UART interrupts
-void EUSCIA0_IRQHandler(){
-    if (EUSCI_A0->IFG & BIT0){
-        addItemCircBuf(RXBuf, EUSCI_A0->RXBUF);
-    }
-    if (EUSCI_A0->IFG & BIT1){
-        //Transmit Stuff
-        if(isEmpty(TXBuf)) {
-            EUSCI_A0->IFG &= ~BIT1;
-            return;
-        }
-//        sendByte(removeItem(TXBuf));
-        EUSCI_A0->TXBUF = removeItem(TXBuf);
-    }
-}
+//void PORT5_IRQHandler() {
+//    // "+" Button
+//    if(P5->IFG & BIT1 && P5->IN & BIT0) {
+//        // if rising edge
+//        if(P5->IES & BIT1) {
+//            P5->IES &= ~BIT1; // set to falling edge
+//            doButtons = 0b01;
+//            enableSystick(50); // set to 50ms
+//        }
+//
+//        // if falling edge
+//        else if(P5->IES & ~BIT1) {
+//            P5->IES &= BIT1; // set to rising edge
+//            doButtons = 0b10;
+//            disableSystick();
+//            RTCSEC = 0;
+//            buttonCount = 0; // reset button count
+//        }
+//    }
+//
+//    // "-" Button
+//    if(P5->IFG & BIT2 && P5->IN & BIT0) {
+//        // if rising edge
+//        if(P5->IES & BIT2) {
+//            P5->IES &= ~BIT2; // set to falling edge
+//            doButtons = 0b00010000;
+//            enableSystick(50); // set to 50ms
+//        }
+//
+//        // if falling edge
+//        else if(P5->IES & ~BIT2) {
+//            P5->IES &= BIT2; // set to rising edge
+//            doButtons = 0b10010000;
+//            disableSystick();
+//            RTCSEC = 0;
+//            buttonCount = 0; // reset button count
+//        }
+//    }
+//    P5->IFG = 0; // clear interrupt flags
+//}
+//
+//// UART interrupts
+//void EUSCIA0_IRQHandler(){
+//    if (EUSCI_A0->IFG & BIT0){
+//        addItemCircBuf(RXBuf, EUSCI_A0->RXBUF);
+//    }
+//    if (EUSCI_A0->IFG & BIT1){
+//        //Transmit Stuff
+//        if(isEmpty(TXBuf)) {
+//            EUSCI_A0->IFG &= ~BIT1;
+//            return;
+//        }
+////        sendByte(removeItem(TXBuf));
+//        EUSCI_A0->TXBUF = removeItem(TXBuf);
+//    }
+//}

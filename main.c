@@ -5,12 +5,6 @@
  *  main.c
  */
 
-#define     MAIN /* runs main loop */
-#define     RUN_SETUP /* runs setup on startup */
-//#define     SHIFT_REG_TEST  // displays 0-9 continuously
-//#define     UART_TEST       // if a msg is properly receive light an LED
-//#define     BUTTONS_TEST    // '+' = blue light toggle, '-' = green light toggle
-
 #include "msp.h"
 #include "rtc.h"
 #include "tubes.h"
@@ -33,6 +27,7 @@ void main(void) {
     // configuration function calls
 	configure_all_pins();
 	configure_SystemClock();
+	configure_low_power_modes();
 	configure_rtc();
 	configure_uart();
 	configure_buttons();

@@ -7,6 +7,6 @@
 
 #include "msp.h"
 
-void enable_low_power();
-
+void configure_low_power_modes();
+void enable_low_power_mode();
 void wake_up_mode();
