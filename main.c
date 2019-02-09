@@ -17,6 +17,7 @@
 #include "peripherals.h"
 #include "timer.h"
 #include "circbuf.h"
+#include "i2c.h"
 
 /*  Display initializes to all segments on
  *      -Defaults to 00:00:00
@@ -52,12 +53,12 @@ void main(void) {
     TXBuf_i2c = createCircBuf(8);
 
     // configuration function calls
-	configure_all_pins();
+//	configure_all_pins();
 	configure_SystemClock();
 //	configure_rtc();
-	configure_uart();
+//	configure_uart();
 	configure_i2c();
-	configure_buttons();
+//	configure_buttons();
 	configure_leds();
 //	configure_shift_pins();
 

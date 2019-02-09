@@ -8,6 +8,7 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../circbuf.c \
+../i2c.c \
 ../main.c \
 ../peripherals.c \
 ../rtc.c \
@@ -18,6 +19,7 @@ C_SRCS += \
 
 C_DEPS += \
 ./circbuf.d \
+./i2c.d \
 ./main.d \
 ./peripherals.d \
 ./rtc.d \
@@ -28,6 +30,7 @@ C_DEPS += \
 
 OBJS += \
 ./circbuf.obj \
+./i2c.obj \
 ./main.obj \
 ./peripherals.obj \
 ./rtc.obj \
@@ -38,6 +41,7 @@ OBJS += \
 
 OBJS__QUOTED += \
 "circbuf.obj" \
+"i2c.obj" \
 "main.obj" \
 "peripherals.obj" \
 "rtc.obj" \
@@ -48,6 +52,7 @@ OBJS__QUOTED += \
 
 C_DEPS__QUOTED += \
 "circbuf.d" \
+"i2c.d" \
 "main.d" \
 "peripherals.d" \
 "rtc.d" \
@@ -58,6 +63,7 @@ C_DEPS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../circbuf.c" \
+"../i2c.c" \
 "../main.c" \
 "../peripherals.c" \
 "../rtc.c" \

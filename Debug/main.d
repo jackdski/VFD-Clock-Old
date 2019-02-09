@@ -23,6 +23,8 @@ main.obj: ../tubes.h
 main.obj: ../timer.h
 main.obj: ../tubes.h
 main.obj: ../circbuf.h
+main.obj: ../i2c.h
+main.obj: ../tubes.h
 
 ../main.c: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -47,3 +49,5 @@ main.obj: ../circbuf.h
 ../timer.h: 
 ../tubes.h: 
 ../circbuf.h: 
+../i2c.h: 
+../tubes.h: 

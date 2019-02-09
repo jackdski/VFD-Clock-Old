@@ -1,2 +1,14 @@
-Debug/*
+Debug/VFD-Clock.map
+Debug/VFD-Clock.out
+Debug/VFD-Clock_linkInfo.xml
+Debug/ccsObjs.opt
+Debug/main.d
+Debug/main.obj
+Debug/makefile
+Debug/peripherals.obj
+Debug/rtc.obj
+Debug/subdir_rules.mk
+Debug/subdir_vars.mk
+Debug/timer.obj
+
 targetConfigs/*
