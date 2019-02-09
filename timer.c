@@ -21,7 +21,7 @@ extern uint8_t seconds;
 
 extern uint8_t doButtons;
 extern uint8_t buttonCount;
-
+extern uint8_t update_request;
 
 ///* timer used for button presses */
 //void enableSystick(uint16_t microseconds) {
@@ -47,27 +47,6 @@ extern uint8_t buttonCount;
 //        RTCMIN--;
 //}
 
-void TA0_0_IRQHandler() {
-
-//    TIMER_A0->CTL &= ~(BIT1);  //Turn off timer interrupts
-//    NVIC_DisableIRQ(TA0_0_IRQn);
-    TIMER_A0->CCTL[0] &= !TIMER_A_CCTLN_CCIE; // disable interrupt
-    buttonCount++; // increment
-    if(doButtons == 0b00001001) // 0x09
-        hours++;
-    else if(doButtons == 0b00000001) // 0x01
-        minutes++;
-    else if(doButtons == 0b10010000) // 0x90
-        hours--;
-    else if(doButtons == 0b00010000)
-        minutes--;
-    setupChanged = 1;
-//    P2->OUT ^= BIT2;
-
-    //Clear the timer interupt
-    TIMER_A0->CCTL[0] &= ~(BIT0);
-}
-
 
 /* set up 50ms timer */
 void configure_setup_timer(){
@@ -78,17 +57,24 @@ void configure_setup_timer(){
     NVIC_EnableIRQ(TA0_0_IRQn);
 }
 
-///* Will display a time or blanks depending on the input */
-//void showTimeSetUp(uint8_t onOff) {
-//    if( onOff == 1 ) {
-//        // display current time
-//        updateTime(hours, minutes, seconds);
-////        onOff = 0;
-//    }
-//    else if( onOff == 0 ) {
-//        // dislay blanks
-//        updateTime(0, 0, 0);
-////        onOff = 1;
-//    }
-//    P2->OUT ^= BIT1;
-//}
+void TA0_0_IRQHandler() {
+
+//    TIMER_A0->CTL &= ~(BIT1);  //Turn off timer interrupts
+//    NVIC_DisableIRQ(TA0_0_IRQn);
+    TIMER_A0->CCTL[0] &= !TIMER_A_CCTLN_CCIE; // disable interrupt
+    buttonCount++; // increment
+
+    if(doButtons == 0b00001001) // 0x09 == increment hours
+        hours++;
+    else if(doButtons == 0b00000001) // 0x01 == increment mins
+        minutes++;
+    else if(doButtons == 0b10010000) // 0x90 == decrement hours
+        hours--;
+    else if(doButtons == 0b00010000)  // 0x10 == decrement minutes
+        minutes--;
+    update_request = 1;
+//    P2->OUT ^= BIT2;
+
+    //Clear the timer interupt
+    TIMER_A0->CCTL[0] &= ~(BIT0);
+}

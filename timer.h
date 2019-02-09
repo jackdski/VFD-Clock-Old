@@ -20,18 +20,16 @@
 #define COUNT_TO    (uint16_t)(4725) // 47255 for 500ms, 4725 for 50ms
 #define SET_CCTL    (uint16_t)(0x0010)
 
-/* timer used for shift register delays */
-void enableSystick(uint16_t microseconds);
-
-/* disable the delay timer */
-void disableSystick();
+///* timer used for shift register delays */
+//void enableSystick(uint16_t microseconds);
+//
+///* disable the delay timer */
+//void disableSystick();
 
 /* disable the delay timer after it counts down all the way */
 //void SysTick_Handler();
 
 void configure_setup_timer();
 
-/* Will display a time or blanks depending on the input */
-//void showTimeSetUp(uint8_t onOff);
 
 #endif /* TIMER_H_ */

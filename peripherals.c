@@ -25,7 +25,10 @@ extern CircBuf_t * RXBuf;
 extern CircBuf_t * TXBuf;
 
 void configure_SystemClock(){
-    CS-> KEY = 0x695A; //Unlock module for register access
+/*
+ * configure the system clock to have DCO be 8MHz
+ */
+    CS-> KEY = CS_KEY_VAL; //Unlock module for register access
     CS-> CTL0 = 0;     //Reset tuning parameters
     CS-> CTL0 = (BIT(23) | CS_CTL0_DCORSEL_3);     //Setup DCO Clock
 
@@ -34,9 +37,11 @@ void configure_SystemClock(){
     CS->KEY = 0;       //Lock CS module for register access.
 }
 
-// configure on P1.2 (RX) and P1.3 (TX) to be used for
-//  Bluetooth UART communication
+
 void configure_uart(){
+/*
+ * configure UART on P1.2 (RX) and P1.3 (TX) to be used for Bluetooth communication
+ */
     //Configure UART pins, set 2-UART pins to UART mode
     P1->SEL0 |=  (BIT2 | BIT3);
     P1->SEL1 &= ~(BIT2 | BIT3);
@@ -53,9 +58,12 @@ void configure_uart(){
 }
 
 void configure_buttons() {
-    // P5.0 -> Change Time Switch
-    // P5.1 -> '+' Button
-    // P5.2 -> '-' Button
+/*
+ *   P5.0 -> Change Time Switch
+ *   P5.1 -> '+' Button
+ *   P5.2 -> '-' Button
+ */
+
 
     // config switch and button SEL reg's
     P5->SEL0 &= ~(BIT0 | BIT1 | BIT2);
@@ -126,7 +134,8 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= ~BIT1; // set to falling edge
                 doButtons = 0b01;
-//                enableSystick(50); // set to 50ms
+                RTCSEC = 0;
+                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
             }
         }
 
@@ -135,9 +144,10 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= BIT1; // set to rising edge
                 doButtons = 0b10;
-//                disableSystick();
                 RTCSEC = 0;
                 buttonCount = 0; // reset button count
+                TIMER_A0->CCTL[0] &= ~(TIMER_A_CCTLN_CCIE);  // disable timer
+                TIMER_A0->R = 0;                             // clear timer count
             }
         }
     }
@@ -149,7 +159,8 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= ~BIT2; // set to falling edge
                 doButtons = 0b00010000;
-//                enableSystick(50); // set to 50ms
+                RTCSEC = 0;
+                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
             }
         }
 
@@ -158,9 +169,10 @@ void PORT5_IRQHandler() {
             if(switch_select == Setup){
                 P5->IES &= BIT2; // set to rising edge
                 doButtons = 0b10010000;
-//                disableSystick();
                 RTCSEC = 0;
                 buttonCount = 0; // reset button count
+                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // disable timer
+                TIMER_A0->R = 0;                          // clear timer count
             }
         }
     }
@@ -178,7 +190,6 @@ void EUSCIA0_IRQHandler(){
             EUSCI_A0->IFG &= ~BIT1;
             return;
         }
-//        sendByte(removeItem(TXBuf));
         EUSCI_A0->TXBUF = removeItem(TXBuf);
     }
 }
