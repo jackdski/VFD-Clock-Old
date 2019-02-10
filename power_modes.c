@@ -35,14 +35,17 @@ void enable_low_power_mode() {
     while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY));
     PCM->CTL0 = 0; // lock register
     if (PCM->IFG & PCM_IFG_AM_INVALID_TR_IFG) // error
-        P2->OUT |= BIT1;
-    SCB->SCR &= ~(SCB_SCR_SEVONPEND_Msk); // SEVONPEND, only enabled interrupts can wake
-    SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Pos);
+        P2->OUT = BIT0; // red light
+    else{
+        P2->OUT = BIT1; // green light
+    }
+    SCB->SCR &= ~(SCB_SCR_SEVONPEND_Pos); // SEVONPEND, only enabled interrupts can wake
+    SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Pos | SCB_SCR_SLEEPONEXIT_Pos);
     // Ensures the SLEEPONEXIT mask is set.
-    __DSB();
-
+//    __DSB();
+    __WFE();
     // Go to LPM0
-    __sleep();
+//    __sleep();
 }
 
 void wake_up_mode(){

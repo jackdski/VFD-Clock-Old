@@ -21,6 +21,7 @@ peripherals.obj: ../tubes.h
 peripherals.obj: ../timer.h
 peripherals.obj: ../tubes.h
 peripherals.obj: ../circbuf.h
+peripherals.obj: ../power_modes.h
 
 ../peripherals.c: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -43,3 +44,4 @@ peripherals.obj: ../circbuf.h
 ../timer.h: 
 ../tubes.h: 
 ../circbuf.h: 
+../power_modes.h: 

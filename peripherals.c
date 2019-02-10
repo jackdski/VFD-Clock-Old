@@ -11,6 +11,7 @@
 #include "tubes.h"
 #include "timer.h"
 #include "circbuf.h"
+#include "power_modes.h"
 
 //extern Mode state;
 extern uint8_t hours;
@@ -53,17 +54,16 @@ void configure_buttons() {
     // P5.1 -> '+' Button
     // P5.2 -> '-' Button
 
-    // config switch and button SEL reg's
-    P5->SEL0 &= ~(BIT0 | BIT1 | BIT2);
-    P5->SEL1 &= ~(BIT0 | BIT1 | BIT2);
-
-    // config switch and +/- buttons direction and pulldown resistor
-    P5->DIR &= ~(BIT0 | BIT1 | BIT4 | BIT5);  // put to input direction
-    P5->REN |= (BIT0 | BIT1 | BIT4 | BIT5);    // enable pullup/down resistor
-    P5->OUT &= ~(BIT0 | BIT1 | BIT4 | BIT5);   // enable pulldown resistor
-    P5->IE |= (BIT1 | BIT2);
-
-    NVIC_EnableIRQ(PORT5_IRQn);
+    P1->SEL0 &= ~(BIT1);      // Set Port Pin Selection to General IO Mode
+    P1->SEL1 &= ~(BIT1);      // Make sure not to use tertiary function of P1.1
+    P1->DIR &=  ~(BIT1);      // Set P1.1 Direction to Input
+    P1->REN |=    BIT1;       // Enable Pullup/Pulldown
+    P1->OUT |=    BIT1;       // Enable PULLUP
+    P1->IFG &=  ~(BIT1);      // Clear interrupts
+    P1->IES =    BIT1;       // Set P1 IFG flag to high to low transition
+    P1->IFG = 0;
+    P1->IE =  (BIT1);
+    NVIC_EnableIRQ(PORT1_IRQn);
 }
 
 void configure_leds() {
@@ -111,6 +111,14 @@ void configure_all_pins() {
 
     P10->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
     P10->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
+}
+
+void PORT1_IRQHandler() {
+    if((P1->IFG & BIT1)) {
+        P1->OUT ^= BIT0;
+        P1->IFG &= ~(BIT1);
+        enable_low_power_mode();
+    }
 }
 
 // +/- control
