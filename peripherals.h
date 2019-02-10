@@ -12,7 +12,8 @@
 
 typedef enum SwitchMode {
     Normal = 0,
-    Setup  = 1
+    Setup  = 1,
+    Temperature = 2
 }SwitchMode;
 
 void configure_SystemClock();

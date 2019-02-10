@@ -86,10 +86,10 @@ void configure_leds() {
     P1->OUT &= ~(BIT0);
 
     // Config Port 2 LED for debugging help
-    P2->SEL0 &= ~(BIT0 | BIT1 | BIT2);
-    P2->SEL1 &= ~(BIT0 | BIT1 | BIT2);
-    P2->DIR |= (BIT0 | BIT1 | BIT2);
-    P2->OUT &= ~(BIT0 | BIT1 | BIT2);
+    P2->SEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4);
+    P2->SEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4);
+    P2->DIR |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4);
+    P2->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4);
 }
 
 /* set all unused pins to low for power reasons */

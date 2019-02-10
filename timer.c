@@ -11,17 +11,16 @@
 #include <stdint.h>
 #include "tubes.h"
 
-//extern Mode state;
+/*  G L O B A L   V A R I A B L E S  */
 extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
 
-//extern uint8_t onOff; // 0 = blanks, 1 = current time
-//extern uint8_t setupChanged;
-
 extern uint8_t doButtons;
 extern uint8_t buttonCount;
 extern uint8_t update_request;
+extern uint8_t temperature_update_request;
+extern uint16_t temperature_timer_count;
 
 ///* timer used for button presses */
 //void enableSystick(uint16_t microseconds) {
@@ -49,12 +48,21 @@ extern uint8_t update_request;
 
 
 /* set up 50ms timer */
-void configure_setup_timer(){
+void configure_setup_timer() {
     TIMER_A0->R = 0;                    // Clear timer count
     TIMER_A0->CTL = SET_CTL;            // Set to SMCLK, Up mode (BIT9 ON)
-    TIMER_A0->CCR[0] = COUNT_TO;        // Count to 50ms
+    TIMER_A0->CCR[0] = COUNT_TO_50;        // Count to 50ms
     TIMER_A0->CCTL[0] |= SET_CCTL;      // TACCR0 interrupt enabled
     NVIC_EnableIRQ(TA0_0_IRQn);
+}
+
+/* set up 500ms timer */
+void configure_temperature_timer() {
+    TIMER_A1->R = 0;
+    TIMER_A1->CTL = SET_CTL;
+    TIMER_A1->CCR[0] = COUNT_TO_500;
+    TIMER_A1->CCTL[0] |= SET_CCTL;
+    NVIC_EnableIRQ(TA1_0_IRQn);
 }
 
 void TA0_0_IRQHandler() {
@@ -77,4 +85,17 @@ void TA0_0_IRQHandler() {
 
     //Clear the timer interupt
     TIMER_A0->CCTL[0] &= ~(BIT0);
+}
+
+void TA1_0_IRQHandler() {
+    temperature_timer_count++;
+    P2->OUT ^= BIT3;
+    if(temperature_timer_count == 400) {
+        // will be get temperature sensor data
+        // for now turn Blue LED on
+        P2->OUT ^= BIT4;
+        temperature_update_request = 1;
+        temperature_timer_count = 0;
+    }
+    TIMER_A1->CCTL[0] &= ~(BIT0);
 }

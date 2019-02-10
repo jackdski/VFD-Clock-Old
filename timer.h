@@ -14,11 +14,12 @@
 #include <stdint.h>
 #include "tubes.h"
 
-// macros for TIMER_A0
-#define CLEAR_TIMER (uint16_t)(0x0000)
-#define SET_CTL     (uint16_t)(TIMER_A_CTL_TASSEL_2 | TIMER_A_CTL_ID_3 | TIMER_A_CTL_MC__UP)
-#define COUNT_TO    (uint16_t)(4725) // 47255 for 500ms, 4725 for 50ms
-#define SET_CCTL    (uint16_t)(0x0010)
+// macros for TIMER_A#
+#define CLEAR_TIMER     (uint16_t)(0x0000)
+#define SET_CTL         (uint16_t)(TIMER_A_CTL_SSEL__SMCLK | TIMER_A_CTL_ID__8 | TIMER_A_CTL_MC__UP)
+#define COUNT_TO_50     (uint16_t)(9375)    //(4725)    // 50ms
+#define COUNT_TO_500    (uint16_t)(37500)   // 200ms
+#define SET_CCTL        (uint16_t)(0x0010)
 
 ///* timer used for shift register delays */
 //void enableSystick(uint16_t microseconds);
@@ -30,6 +31,6 @@
 //void SysTick_Handler();
 
 void configure_setup_timer();
-
+void configure_temperature_timer();
 
 #endif /* TIMER_H_ */
