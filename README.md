@@ -2,7 +2,7 @@
 Firmware files for a VFD Tube Clock
 
 Clean up branches from comments and formatting:
-- [ ] Power Management
+- [x] Power Management
 - [ ] Shift Reg
 - [ ] Switchs/Buttons
 - [ ] I2C
@@ -13,7 +13,7 @@ Power Management:
 - Goes to sleep:
   - [ ] inbetween RTC updates
   - [ ] inbetween temp sensor reads
-- [ ] Wakes up on any interrupt
+- [x] Wakes up on interrupt
 
 Shift Registers:
 - [ ] Verify correct data is sent to shift reg's
@@ -21,8 +21,10 @@ Shift Registers:
   - [ ] Does sequence [0xFF, 0xAA, 0x00, 0xAA]
   
 Switches and Buttons:
-- [ ] Interrupts when buttons are pressed
+- [x] Interrupts when buttons are pressed
 - [ ] Interrupts when switches are moved
+- [x] 5s timer
+- [ ] 50ms timer
   
 I2C:
 - [ ] Send Data
@@ -37,10 +39,10 @@ UART and SPI:
   - [ ] SPI
   
 - Commands/Messages:
-  - [ ] SET_TIME:hh:mm:ss
-  - [ ] TEMP_MODE
-  - [ ] CLOCK_MODE
-  - [ ] ACK
-  - [ ] NACK
+  - [ ] Set Time -> 0x11 followed by 0xHHMMSS
+  - [ ] Reqest Temp Mode -> 0x22
+  - [ ] request Clock Mode -> 0x33
+  - [ ] ACK -> 0x44
+  - [ ] NACK -> 0x55
 
 Power Management -> Shift Regs -> Switches and Buttons -> I2C -> UART and SPI 
