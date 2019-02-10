@@ -11,8 +11,9 @@
 #include "tubes.h"
 #include "timer.h"
 #include "circbuf.h"
+#include "peripherals.h"
 
-//extern Mode state;
+extern SwitchMode switch_select;
 extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
@@ -22,8 +23,6 @@ extern uint8_t buttonCount;
 
 extern CircBuf_t * RXBuf;
 extern CircBuf_t * TXBuf;
-
-
 
 void configure_SystemClock(){
     CS-> KEY = 0x695A; //Unlock module for register access
@@ -53,11 +52,13 @@ void configure_uart(){
     NVIC_EnableIRQ(EUSCIA0_IRQn);
 }
 
-void configure_buttons() {
-    // P5.0 -> Change Time Switch
-    // P5.1 -> '+' Button
-    // P5.2 -> '-' Button
 
+void configure_buttons() {
+/*
+ *   P5.0 -> Change Time Switch
+ *   P5.1 -> '+' Button
+ *   P5.2 -> '-' Button
+ */
     // config switch and button SEL reg's
     P5->SEL0 &= ~(BIT0 | BIT1 | BIT2);
     P5->SEL1 &= ~(BIT0 | BIT1 | BIT2);
@@ -124,18 +125,24 @@ void PORT5_IRQHandler() {
     if(P5->IFG & BIT1 && P5->IN & BIT0) {
         // if rising edge
         if(P5->IES & BIT1) {
-            P5->IES &= ~BIT1; // set to falling edge
-            doButtons = 0b01;
-            enableSystick(50); // set to 50ms
+            if(switch_select == Setup){
+                P5->IES &= ~BIT1; // set to falling edge
+                doButtons = 0b01;
+                RTCSEC = 0;
+                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
+            }
         }
 
         // if falling edge
         else if(P5->IES & ~BIT1) {
-            P5->IES &= BIT1; // set to rising edge
-            doButtons = 0b10;
-            disableSystick();
-            RTCSEC = 0;
-            buttonCount = 0; // reset button count
+            if(switch_select == Setup){
+                P5->IES &= BIT1; // set to rising edge
+                doButtons = 0b10;
+                RTCSEC = 0;
+                buttonCount = 0; // reset button count
+                TIMER_A0->CCTL[0] &= ~(TIMER_A_CCTLN_CCIE);  // disable timer
+                TIMER_A0->R = 0;                             // clear timer count
+            }
         }
     }
 
@@ -143,18 +150,24 @@ void PORT5_IRQHandler() {
     if(P5->IFG & BIT2 && P5->IN & BIT0) {
         // if rising edge
         if(P5->IES & BIT2) {
-            P5->IES &= ~BIT2; // set to falling edge
-            doButtons = 0b00010000;
-            enableSystick(50); // set to 50ms
+            if(switch_select == Setup){
+                P5->IES &= ~BIT2; // set to falling edge
+                doButtons = 0b00010000;
+                RTCSEC = 0;
+                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
+            }
         }
 
         // if falling edge
         else if(P5->IES & ~BIT2) {
-            P5->IES &= BIT2; // set to rising edge
-            doButtons = 0b10010000;
-            disableSystick();
-            RTCSEC = 0;
-            buttonCount = 0; // reset button count
+            if(switch_select == Setup){
+                P5->IES &= BIT2; // set to rising edge
+                doButtons = 0b10010000;
+                RTCSEC = 0;
+                buttonCount = 0; // reset button count
+                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // disable timer
+                TIMER_A0->R = 0;                          // clear timer count
+            }
         }
     }
     P5->IFG = 0; // clear interrupt flags
@@ -171,7 +184,6 @@ void EUSCIA0_IRQHandler(){
             EUSCI_A0->IFG &= ~BIT1;
             return;
         }
-//        sendByte(removeItem(TXBuf));
         EUSCI_A0->TXBUF = removeItem(TXBuf);
     }
 }

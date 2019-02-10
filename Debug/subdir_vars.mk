@@ -10,6 +10,7 @@ C_SRCS += \
 ../circbuf.c \
 ../main.c \
 ../peripherals.c \
+../power_modes.c \
 ../rtc.c \
 ../startup_msp432p401r_ccs.c \
 ../system_msp432p401r.c \
@@ -20,6 +21,7 @@ C_DEPS += \
 ./circbuf.d \
 ./main.d \
 ./peripherals.d \
+./power_modes.d \
 ./rtc.d \
 ./startup_msp432p401r_ccs.d \
 ./system_msp432p401r.d \
@@ -30,6 +32,7 @@ OBJS += \
 ./circbuf.obj \
 ./main.obj \
 ./peripherals.obj \
+./power_modes.obj \
 ./rtc.obj \
 ./startup_msp432p401r_ccs.obj \
 ./system_msp432p401r.obj \
@@ -40,6 +43,7 @@ OBJS__QUOTED += \
 "circbuf.obj" \
 "main.obj" \
 "peripherals.obj" \
+"power_modes.obj" \
 "rtc.obj" \
 "startup_msp432p401r_ccs.obj" \
 "system_msp432p401r.obj" \
@@ -50,6 +54,7 @@ C_DEPS__QUOTED += \
 "circbuf.d" \
 "main.d" \
 "peripherals.d" \
+"power_modes.d" \
 "rtc.d" \
 "startup_msp432p401r_ccs.d" \
 "system_msp432p401r.d" \
@@ -60,6 +65,7 @@ C_SRCS__QUOTED += \
 "../circbuf.c" \
 "../main.c" \
 "../peripherals.c" \
+"../power_modes.c" \
 "../rtc.c" \
 "../startup_msp432p401r_ccs.c" \
 "../system_msp432p401r.c" \
