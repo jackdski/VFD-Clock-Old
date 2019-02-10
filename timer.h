@@ -17,8 +17,7 @@
 // macros for TIMER_A#
 #define CLEAR_TIMER     (uint16_t)(0x0000)
 #define SET_CTL         (uint16_t)(TIMER_A_CTL_SSEL__SMCLK | TIMER_A_CTL_ID__8 | TIMER_A_CTL_MC__UP)
-#define COUNT_TO_50     (uint16_t)(9375)    //(4725)    // 50ms
-#define COUNT_TO_500    (uint16_t)(37500)   // 200ms
+#define COUNT_TO_25    (uint16_t)(37500)   // 25ms
 #define SET_CCTL        (uint16_t)(0x0010)
 
 ///* timer used for shift register delays */
