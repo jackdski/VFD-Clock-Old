@@ -1,6 +1,6 @@
 /*
  * VFD Tube Clock
- * Jack Danielski
+ * @author: Jack Danielski
  *
  *  power_modes.h
  */
@@ -9,4 +9,3 @@
 
 void configure_low_power_modes();
 void enable_low_power_mode();
-void wake_up_mode();

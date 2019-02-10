@@ -117,64 +117,25 @@ void PORT1_IRQHandler() {
     if((P1->IFG & BIT1)) {
         P1->OUT ^= BIT0;
         P1->IFG &= ~(BIT1);
-        enable_low_power_mode();
+//        enable_low_power_mode();
+//        SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
+//        SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+//        SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
+//        __DSB();
+//        __WFI();
+
+        SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+        PCM->CTL0 &= ~(PCM_CTL0_LPMR__LPM3);
+        if(PCM->IFG & PCM_CLRIFG_CLR_LPM_INVALID_CLK_IFG) {
+            P2->OUT = BIT0;
+        }
+        else if(PCM->IFG & PCM_CLRIFG_CLR_LPM_INVALID_TR_IFG ){
+            P2->OUT = BIT0;
+        }
+        else {
+            P2->OUT = BIT1;
+        }
+        __DSB();
+        __WFE();
     }
 }
-
-// +/- control
-//void PORT5_IRQHandler() {
-//    // "+" Button
-//    if(P5->IFG & BIT1 && P5->IN & BIT0) {
-//        // if rising edge
-//        if(P5->IES & BIT1) {
-//            P5->IES &= ~BIT1; // set to falling edge
-//            doButtons = 0b01;
-//            enableSystick(50); // set to 50ms
-//        }
-//
-//        // if falling edge
-//        else if(P5->IES & ~BIT1) {
-//            P5->IES &= BIT1; // set to rising edge
-//            doButtons = 0b10;
-//            disableSystick();
-//            RTCSEC = 0;
-//            buttonCount = 0; // reset button count
-//        }
-//    }
-//
-//    // "-" Button
-//    if(P5->IFG & BIT2 && P5->IN & BIT0) {
-//        // if rising edge
-//        if(P5->IES & BIT2) {
-//            P5->IES &= ~BIT2; // set to falling edge
-//            doButtons = 0b00010000;
-//            enableSystick(50); // set to 50ms
-//        }
-//
-//        // if falling edge
-//        else if(P5->IES & ~BIT2) {
-//            P5->IES &= BIT2; // set to rising edge
-//            doButtons = 0b10010000;
-//            disableSystick();
-//            RTCSEC = 0;
-//            buttonCount = 0; // reset button count
-//        }
-//    }
-//    P5->IFG = 0; // clear interrupt flags
-//}
-//
-//// UART interrupts
-//void EUSCIA0_IRQHandler(){
-//    if (EUSCI_A0->IFG & BIT0){
-//        addItemCircBuf(RXBuf, EUSCI_A0->RXBUF);
-//    }
-//    if (EUSCI_A0->IFG & BIT1){
-//        //Transmit Stuff
-//        if(isEmpty(TXBuf)) {
-//            EUSCI_A0->IFG &= ~BIT1;
-//            return;
-//        }
-////        sendByte(removeItem(TXBuf));
-//        EUSCI_A0->TXBUF = removeItem(TXBuf);
-//    }
-//}
