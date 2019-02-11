@@ -24,20 +24,19 @@ Switches and Buttons:
 - [x] Interrupts when buttons are pressed
 - [ ] Interrupts when switches are moved
 - [x] 5s timer
-- [ ] 50ms timer
+- [x] 50ms timer
   
 I2C:
 - [ ] Send Data
 - [ ] Receive Data
 - [ ] Sample and Record Temperature
-- [ ] 10 second timer to trigger temp update
+- [x] 10 second timer to trigger temp update
 
 UART and SPI:
 - SPI is nice to have, optional
 - Can send and receive data
   - [x] UART
   - [ ] SPI
-  
 - Commands/Messages:
   - [ ] Set Time -> 0x11 followed by 0xHHMMSS
   - [ ] Reqest Temp Mode -> 0x22
