@@ -64,13 +64,13 @@ void RTC_C_IRQHandler() {
         // now update tubes
         switch(changes) {
         case 0b001:
-            updateSeconds(RTCSEC);
+            update_seconds(RTCSEC);
             break;
         case 0b011:
-            updateMinutes(RTCMIN, RTCSEC);
+            update_minutes(RTCMIN, RTCSEC);
             break;
         case 0b111:
-            updateTime(RTCHOUR, RTCMIN, RTCSEC);
+            update_time(RTCHOUR, RTCMIN, RTCSEC);
             break;
         }
     }
