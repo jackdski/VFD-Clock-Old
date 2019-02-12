@@ -58,22 +58,20 @@ void configure_uart(){
 }
 
 void configure_buttons() {
-/*
- *   P5.0 -> Change Time Switch
+/*   P5.0 -> Change Time Switch
  *   P5.1 -> '+' Button
  *   P5.2 -> '-' Button
- */
-
+ *   P5.4 -> Temp/Time Select   */
 
     // config switch and button SEL reg's
     P5->SEL0 &= ~(BIT0 | BIT1 | BIT2);
     P5->SEL1 &= ~(BIT0 | BIT1 | BIT2);
 
     // config switch and +/- buttons direction and pulldown resistor
-    P5->DIR &= ~(BIT0 | BIT1 | BIT4 | BIT5);  // put to input direction
-    P5->REN |= (BIT0 | BIT1 | BIT4 | BIT5);    // enable pullup/down resistor
-    P5->OUT &= ~(BIT0 | BIT1 | BIT4 | BIT5);   // enable pulldown resistor
-    P5->IE |= (BIT1 | BIT2);
+    P5->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT4);    // put to input direction
+    P5->REN |= (BIT0 | BIT1 | BIT2 | BIT4);     // enable pullup/down resistor
+    P5->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT4);    // select pulldown resistor
+    P5->IE |= (BIT0 | BIT1 | BIT2 | BIT4);      // enable interrupts on buttons and switches
 
     NVIC_EnableIRQ(PORT5_IRQn);
 }
@@ -90,6 +88,11 @@ void configure_leds() {
     P2->SEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4);
     P2->DIR |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4);
     P2->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4);
+
+    P5->SEL0 &= ~(BIT3);
+    P5->SEL1 &= ~(BIT3);
+    P5->DIR |= BIT3;
+    P5->OUT &= ~(BIT3);
 }
 
 /* set all unused pins to low for power reasons */
@@ -125,57 +128,103 @@ void configure_all_pins() {
     P10->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 }
 
-// +/- control
 void PORT5_IRQHandler() {
-    // "+" Button
-    if(P5->IFG & BIT1 && P5->IN & BIT0) {
-        // if rising edge
-        if(P5->IES & BIT1) {
-            if(switch_select == Setup){
-                P5->IES &= ~BIT1; // set to falling edge
-                doButtons = 0b01;
-                RTCSEC = 0;
-                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
-            }
+    // Setup Switch
+    if(P5->IFG & BIT0) {    // change mode to Setup
+        // maybe use (P5->IN & BIT0) instead
+        if((P5->IES & BIT0) && (P5->IN & BIT4)) {    // if Setup turns on and Temp Mode is on
+            P5->IES &= ~(BIT0); // set to trigger flag on falling edge
+            switch_select = Temperature; // or setup??
         }
+        else if((P5->IES & BIT0) && !(P5->IN & BIT4)) { // if Setup turning on and Temp Mode off
+            P5->IES |= BIT0;    // trigger flag on rising edge
+            switch_select = Setup;
+        }
+        else if(!(P5->IES & BIT0) && (P5->IN & BIT4)) {  // if Setup turning off and Temp mode on
+            P5->IES |= BIT0;    // trigger flag on rising edge
+            switch_select = Temperature;
+        }
+        else if(!(P5->IES & BIT0) && !(P5->IN & BIT4)) { // if Setup turning off and Temp mode off
+            P5->IES |= BIT0;    // trigger flag on rising edge
+            switch_select = Normal;
+        }
+    }
 
-        // if falling edge
-        else if(P5->IES & ~BIT1) {
-            if(switch_select == Setup){
-                P5->IES &= BIT1; // set to rising edge
-                doButtons = 0b10;
-                RTCSEC = 0;
-                buttonCount = 0; // reset button count
-                TIMER_A0->CCTL[0] &= ~(TIMER_A_CCTLN_CCIE);  // disable timer
-                TIMER_A0->R = 0;                             // clear timer count
+    // "+" Button
+    if(P5->IFG & BIT1) {   // if '+' button Change Time switch is on
+        if((P5->IN & BIT4) && (P5->IN & BIT0)) {    // make sure in time and setup modes
+            // if rising edge
+            if(P5->IES & BIT1) {
+                if(switch_select == Setup){
+                    P5->IES &= ~(BIT1); // set to falling edge
+                    doButtons = 0b01;
+                    RTCSEC = 0;
+                    TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
+                }
+            }
+
+            // if falling edge
+            else if(P5->IES & ~BIT1) {
+                if(switch_select == Setup){
+                    P5->IES &= BIT1; // set to rising edge
+                    doButtons = 0b10;
+                    RTCSEC = 0;
+                    buttonCount = 0; // reset button count
+                    TIMER_A0->CCTL[0] &= ~(TIMER_A_CCTLN_CCIE);  // disable timer
+                    TIMER_A0->R = 0;                             // clear timer count
+                }
             }
         }
     }
 
     // "-" Button
-    if(P5->IFG & BIT2 && P5->IN & BIT0) {
-        // if rising edge
-        if(P5->IES & BIT2) {
-            if(switch_select == Setup){
-                P5->IES &= ~BIT2; // set to falling edge
-                doButtons = 0b00010000;
-                RTCSEC = 0;
-                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
+    if(P5->IFG & BIT2) {
+        if((P5->IN & BIT4) && (P5->IN & BIT0)) {    // make sure in time mode
+            // if rising edge
+            if(P5->IES & BIT2) {
+                if(switch_select == Setup){
+                    P5->IES &= ~BIT2; // set to falling edge
+                    doButtons = 0b00010000;
+                    RTCSEC = 0;
+                    TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // enable timer
+                }
             }
-        }
 
-        // if falling edge
-        else if(P5->IES & ~BIT2) {
-            if(switch_select == Setup){
-                P5->IES &= BIT2; // set to rising edge
-                doButtons = 0b10010000;
-                RTCSEC = 0;
-                buttonCount = 0; // reset button count
-                TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // disable timer
-                TIMER_A0->R = 0;                          // clear timer count
+            // if falling edge
+            else if(P5->IES & ~BIT2) {
+                if(switch_select == Setup){
+                    P5->IES &= BIT2; // set to rising edge
+                    doButtons = 0b10010000;
+                    RTCSEC = 0;
+                    buttonCount = 0; // reset button count
+                    TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE;  // disable timer
+                    TIMER_A0->R = 0;                          // clear timer count
+                }
             }
         }
     }
+
+    // Temp/Time Switch
+    if(P5->IFG & BIT4) {
+        // maybe use (P5->IN & BIT0) instead
+        if((P5->IES & BIT4) && (P5->IN & BIT0)) {    // if go to temp and in setup mode
+            P5->IES &= ~(BIT4); // set to trigger flag on falling edge
+            switch_select = Temperature; // or setup??
+        }
+        else if((P5->IES & BIT4) && !(P5->IN & BIT0)) { // if go to temp and in show time mode
+            P5->IES |= BIT4;    // trigger flag on rising edge
+            switch_select = Temperature;
+        }
+        else if(!(P5->IES & BIT4) && (P5->IN & BIT0)) {  // if go to time and in setup mode
+            P5->IES |= BIT4;    // trigger flag on rising edge
+            switch_select = Setup;
+        }
+        else if(!(P5->IES & BIT4) && !(P5->IN & BIT0)) { // if go to time and in show time mode
+            P5->IES |= BIT4;    // trigger flag on rising edge
+            switch_select = Normal;
+        }
+    }
+
     P5->IFG = 0; // clear interrupt flags
 }
 
