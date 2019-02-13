@@ -16,13 +16,13 @@ Power Management:
 - [x] Wakes up on interrupt
 
 Shift Registers:
-- [ ] Verify correct data is sent to shift reg's
+- [x] Verify correct data is sent to shift reg's
 - Verify correct sequence is shown on LEDs
-  - [ ] Does sequence [0xFF, 0xAA, 0x00, 0xAA]
+  - [x] Does sequence [0xFF, 0xAA, 0x00, 0xAA]
   
 Switches and Buttons:
 - [x] Interrupts when buttons are pressed
-- [ ] Interrupts when switches are moved
+- [x] Interrupts when switches are moved
 - [x] 5s timer
 - [x] 50ms timer
   
