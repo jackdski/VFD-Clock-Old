@@ -69,17 +69,21 @@ void pulse_clock() {
 
 /* Configures the shift registers to be used */
 void configure_shift_pins() {
+    P6->SEL0 &= ~(BIT1);
     P4->SEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P3->SEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 
+    P6->SEL1 &= ~(BIT1);
     P4->SEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P3->SEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 
     // set to output
+    P6->DIR |= (BIT1);
     P4->DIR |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P3->DIR |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 
     // set all outputs low
+    P6->OUT &= ~(BIT1);
     P4->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
     P3->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 }
@@ -117,12 +121,12 @@ void update_seconds(uint8_t decSecs) {
     uint8_t segSecsOne = dec_to_sev_seg(decSecs / 10);
     uint8_t segSecsTwo = dec_to_sev_seg(decSecs % 10);
 
-    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 low
 
     shift_out(5, segSecsOne);
     shift_out(6, segSecsTwo);
 
-    P4->OUT |= BIT1;    // set latch (!SRCLR0) high again
+    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) low again
 }
 
 /* updates only the two tubes related to minutes */
@@ -132,7 +136,7 @@ void update_minutes(uint8_t decMins, uint8_t decSecs) {
     uint8_t segSecsOne = dec_to_sev_seg(decSecs / 10);
     uint8_t segSecsTwo = dec_to_sev_seg(decSecs % 10);
 
-    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 high
 
     // write the values to the tubes
     shift_out(3, segMinsOne);
@@ -140,7 +144,7 @@ void update_minutes(uint8_t decMins, uint8_t decSecs) {
     shift_out(5, segSecsOne);
     shift_out(6, segSecsTwo);
 
-    P4->OUT |= BIT1;    // set latch (!SRCLR0) high again
+    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) high again
 }
 
 /* updates hours, minutes, and seconds */
@@ -154,7 +158,7 @@ void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     uint8_t segSecsOne = dec_to_sev_seg(decSecs / 10);
     uint8_t segSecsTwo = dec_to_sev_seg(decSecs % 10);
 
-    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 high
 
     // write the values to the tubes
     shift_out(1, segHrsOne);
@@ -164,7 +168,7 @@ void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     shift_out(5, segSecsOne);
     shift_out(6, segSecsTwo);
 
-    P4->OUT |= BIT1;    // set latch (!SRCLR0) high again
+    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) low again
 }
 
 
@@ -175,7 +179,7 @@ void update_temperature(uint8_t temperature) {
     uint8_t degrees = DEGREES;
     uint8_t letter_f = LETTER_F;
 
-    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 high
 
     // first two blank
     shift_out(1, 0);
@@ -185,7 +189,7 @@ void update_temperature(uint8_t temperature) {
     shift_out(5, letter_f);          // F
     shift_out(6, 0);
 
-    P4->OUT |= BIT1;    // set latch (!SRCLR0) high again
+    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) low again
 }
 
 
@@ -197,4 +201,5 @@ void shift_out(uint8_t tubeNumber, uint8_t val) {
 //        P4->OUT ^= BIT2; // test value
         pulse_clock(); // P4.0
     }
+    P6->OUT &= ~(BIT1);
 }
