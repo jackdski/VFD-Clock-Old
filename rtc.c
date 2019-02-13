@@ -7,16 +7,21 @@
 
 #include "msp.h"
 #include "tubes.h"
+#include "power_modes.h"
+
+/* --- G L O B A L   V A R I A B L E S --- */
 
 extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
-//extern uint8_t timeChanged;
+
+/* --- R T C   F U N C T I O N S --- */
 
 void configure_rtc() {
 //    RTC_C->CTL0 = RTC_C_KEY;
     RTCCTL0_H = RTCKEY_H; // use key (A5h) to allow for changes to be made
     RTCCTL0_L |= RTC_C_CTL0_RDYIE; // enable interrupt to allow register reading
+
     // Hexadecimal mode, with events going off every hour change
     RTC_C->CTL13 &= ~(RTC_C_CTL13_BCD | RTC_C_CTL13_HOLD);
     RTC_C->CTL13 |= RTC_C_CTL13_MODE | RTC_C_CTL13_TEV_1;
@@ -28,6 +33,7 @@ void configure_rtc() {
     RTC_C->CTL0 = 0xFF;
     NVIC_EnableIRQ(RTC_C_IRQn);
 }
+
 
 void RTC_C_IRQHandler() {
     // if ready to read from
@@ -78,4 +84,5 @@ void RTC_C_IRQHandler() {
 
 //    RTCCTL0_L &=  !RTC_C_CTL0_RDYIFG;// clear interrupt flag?
     RTCIV &= 0x00; // clear interrupt
+    enable_low_power_mode();
 }

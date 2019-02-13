@@ -7,15 +7,16 @@
 
 
 #include "msp.h"
-#include "rtc.h"
-#include "tubes.h"
-#include "peripherals.h"
-#include "timer.h"
+
 #include "circbuf.h"
+#include "peripherals.h"
 #include "power_modes.h"
+#include "rtc.h"
+#include "timer.h"
+#include "tubes.h"
 
 
-/* G L O B A L   V A R I A B L E S */
+/* --- G L O B A L   V A R I A B L E S --- */
 
 // Switch Mode Select
 SwitchMode switch_select = Normal;
@@ -46,14 +47,15 @@ volatile uint8_t temperature_update_request = 0; // sample temperature if 1
 volatile uint16_t temperature_timer_count = 0;   // count to 400 for 5s
 
 
-/*      M A I N      */
+
+/* -----M A I N----- */
+
 
 void main(void) {
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
 
-	// create circular buffer for Bluetooth comm
-    RXBuf = createCircBuf(8);
-    TXBuf = createCircBuf(16);
+    RXBuf = createCircBuf(8);   // circular buffer for BLE RX
+    TXBuf = createCircBuf(16);  // circular buffer for BLE TX
 
     // configuration function calls
 	//configure_all_pins();
@@ -66,13 +68,11 @@ void main(void) {
 	configure_temperature_timer();
 
 	__enable_irq();
-	enable_low_power_mode();
 
+    update_time(hours, minutes, seconds);   // display time
+    configure_rtc();    // configure RTC last
 
-    update_time(hours, minutes, seconds);
-    configure_rtc();    // now config RTC
-
-	/* MAIN LOOP */
+	/*--MAIN LOOP--*/
 	while(1) {
         if(switch_select == Normal) {
             // if RTC interrupts are off turn them on

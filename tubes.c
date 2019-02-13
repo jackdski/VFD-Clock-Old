@@ -12,6 +12,8 @@
 #include <stdint.h>
 #include "tubes.h"
 
+/*  7 - S E G M E N T   V A L U E S  */
+
 /* Binary values that will display the corresponding
  * numbers on the seven segment displays after being
  * loaded to the shift register  */
@@ -29,14 +31,7 @@
 #define DEGREES     0b01101011; // 0x6B
 
 
-/* Pin numbers on Port 4 that connect to the
- * serial pin of the shift register */
-//#define TUBE_1_SER      2   // Hours 1
-//#define TUBE_2_SER      3   // Hours 2
-//#define TUBE_3_SER      4   // Minutes 1
-//#define TUBE_4_SER      5   // Minutes 2
-//#define TUBE_5_SER      6   // Seconds 1
-//#define TUBE_6_SER      7   // Seconds 2
+/*  S H I F T   R E G I S T E R   F U N C T I O N S  */
 
 /* 1-6 for select tubes, 7 for all */
 void disable_output(uint8_t target) {

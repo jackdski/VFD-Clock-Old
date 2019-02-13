@@ -3,13 +3,14 @@
  * circbuf.c
  *
  * Created on 9-28-17 for ECEN 2440
- * Author: Jack Danielski and Avery Anderson
+ * AuthorS: Jack Danielski and Avery Anderson
  *
  */
 
-
 #include "circbuf.h"
 #include <stdlib.h>
+
+/* --- C I R C U L A R   B U F F E R    F U N C T I O N S --- */
 
 // Function to create a circle buffer of a specified length to a prexisitng CircBuf
 CircBuf_t * createCircBuf(uint32_t length) {

@@ -11,6 +11,7 @@
 #include "timer.h"
 #include "power_modes.h"
 
+/* --- P O W E R   M O D E   F U N C T I O N S --- */
 
 void configure_low_power_modes(){
     /* Enables the MSP432 in LPM0_LF_VCORE0 sleep power mode */

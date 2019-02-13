@@ -17,6 +17,7 @@ rtc.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h
 rtc.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 rtc.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
 rtc.obj: ../tubes.h
+rtc.obj: ../power_modes.h
 
 ../rtc.c: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -35,3 +36,4 @@ rtc.obj: ../tubes.h
 /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
 ../tubes.h: 
+../power_modes.h: 

@@ -16,13 +16,13 @@ main.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h
 main.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h
 main.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 main.obj: /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
-main.obj: ../rtc.h
-main.obj: ../tubes.h
+main.obj: ../circbuf.h
 main.obj: ../peripherals.h
+main.obj: ../power_modes.h
+main.obj: ../rtc.h
 main.obj: ../timer.h
 main.obj: ../tubes.h
-main.obj: ../circbuf.h
-main.obj: ../power_modes.h
+main.obj: ../tubes.h
 
 ../main.c: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -40,10 +40,10 @@ main.obj: ../power_modes.h
 /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
 /home/jack/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
-../rtc.h: 
-../tubes.h: 
+../circbuf.h: 
 ../peripherals.h: 
+../power_modes.h: 
+../rtc.h: 
 ../timer.h: 
 ../tubes.h: 
-../circbuf.h: 
-../power_modes.h: 
+../tubes.h: 

@@ -13,6 +13,8 @@
 #include "circbuf.h"
 #include "peripherals.h"
 
+/* --- G L O B A L   V A R I A B L E S --- */
+
 extern SwitchMode switch_select;
 extern uint8_t hours;
 extern uint8_t minutes;
@@ -23,6 +25,8 @@ extern uint8_t buttonCount;
 
 extern CircBuf_t * RXBuf;
 extern CircBuf_t * TXBuf;
+
+/* --- P E R I P H E R A L S   F U N C T I O N S --- */
 
 void configure_SystemClock(){
     CS-> KEY = 0x695A; //Unlock module for register access

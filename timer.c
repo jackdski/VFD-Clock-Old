@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include "tubes.h"
 
-/*  G L O B A L   V A R I A B L E S  */
+/* --- G L O B A L   V A R I A B L E S --- */
 
 extern uint8_t hours;
 extern uint8_t minutes;
@@ -21,6 +21,8 @@ extern uint8_t buttonCount;
 extern uint8_t update_request;
 extern uint8_t temperature_update_request;
 extern uint16_t temperature_timer_count;
+
+/* --- T I M E R   F U N C T I O N S --- */
 
 /* set up 50ms timer */
 void configure_setup_timer(){
