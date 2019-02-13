@@ -69,12 +69,13 @@ void main(void) {
 	enable_low_power_mode();
 
 
-    updateTime(hours, minutes, seconds);
+    update_time(hours, minutes, seconds);
     configure_rtc();    // now config RTC
 
 	/* MAIN LOOP */
 	while(1) {
         if(switch_select == Normal) {
+            // if RTC interrupts are off turn them on
             if(NVIC->ISER[(((uint32_t)(int32_t)RTC_C_IRQn) >> 5UL)] ==
                     (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {
                 NVIC_EnableIRQ(RTC_C_IRQn);
@@ -83,15 +84,16 @@ void main(void) {
         else if(switch_select == Setup) {
             P2->OUT |= (BIT0 | BIT2); // indicate setup mode
             if(update_request == 1) {
-                updateTime(hours, minutes, seconds);// do update
+                update_time(hours, minutes, seconds);// do update
                 update_request = 0;                 // reset update request
             }
         }
         else if(switch_select == Temperature) {
             // need to add way of reset timer_count
             if(temperature_update_request == 1) {
-                // updateTemp(); // shows temp on display
-                P2->OUT ^= BIT2; // just blink instead of temp. sample
+                // temperature = ...    // get temp
+                // update_temperature(); // put latest temperature on display
+                P2->OUT ^= BIT2; // just blink for now instead of temperature sample
                 temperature_update_request = 0;
             }
         }

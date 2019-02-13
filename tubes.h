@@ -9,35 +9,38 @@
 #include <stdint.h>
 
 /* 1-6 for select tubes, 7 for all */
-void disableOutput(uint8_t target);
+void disable_output(uint8_t target);
 
 /* Enable the output from the shift register */
-void enableOutput(uint8_t target);
+void enable_output(uint8_t target);
 
 /* Pulse clock pin to shift a bit in the shift registers  */
-void pulseClock();
+void pulse_clock();
 
 /* Configures the shift registers to be used */
 void configure_shift_pins();
 
 /* returns a value that will show the input value
  * in the uint8_t on 7-seg display */
-uint8_t decToSevSeg(uint8_t value);
+uint8_t dec_to_sev_seg(uint8_t value);
 
 /* sets a pin for an assigned tube high or low */
-void assignPin(uint8_t tube, uint8_t val);
+void assign_pin(uint8_t tube, uint8_t val);
 
 /* updates only the two tubes related to seconds */
-void updateSeconds(uint8_t value);
+void update_seconds(uint8_t value);
 
 /* updates only the two tubes related to minutes */
-void updateMinutes(uint8_t minsValue, uint8_t secsValue);
+void update_minutes(uint8_t minsValue, uint8_t secsValue);
 
 /* updates only the two tubes related to seconds */
-void updateHours(uint8_t value);
+void update_hours(uint8_t value);
 
-/* updates hours, minutes, and seconds all at once */
-void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs);
+/* updates hours, minutes, and seconds */
+void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs);
 
 /* places a value in the shift register */
-void shiftOut(uint8_t tubeNumber, uint8_t val);
+void update_temperature(uint8_t temperature);
+
+/* places a value in the shift register */
+void shift_out(uint8_t tubeNumber, uint8_t val);
