@@ -143,7 +143,7 @@ void updateMinutes(uint8_t decMins, uint8_t decSecs) {
 }
 
 /* updates hours, minutes, and seconds all at once */
-void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
+void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
 
     uint8_t segHrsOne = decToSevSeg(decHrs / 10);

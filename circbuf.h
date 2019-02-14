@@ -13,8 +13,8 @@ typedef struct{
     uint8_t * buffer;
     volatile uint8_t * head;
     volatile uint8_t * tail;
-    volatile uint32_t num_items;
-    volatile uint32_t length;
+    volatile uint8_t num_items;
+    volatile uint8_t length;
 }CircBuf_t;
 
 CircBuf_t * createCircBuf(uint32_t length);
@@ -25,6 +25,6 @@ void        addItemCircBuf(CircBuf_t * buf, uint8_t item);
 uint8_t     isEmpty(CircBuf_t * buf);
 void        loadToBuf(CircBuf_t * buf, uint8_t * string, uint8_t length);
 uint8_t     removeItem(CircBuf_t * buf);
-
+uint8_t     get_length_buf(CircBuf_t * buf);
 
 #endif

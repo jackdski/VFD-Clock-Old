@@ -71,7 +71,7 @@ void RTC_C_IRQHandler() {
             updateMinutes(RTCMIN, RTCSEC);
             break;
         case 0b111:
-            updateTime(RTCHOUR, RTCMIN, RTCSEC);
+            update_time(RTCHOUR, RTCMIN, RTCSEC);
             break;
         }
     }

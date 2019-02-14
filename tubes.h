@@ -37,7 +37,7 @@ void updateMinutes(uint8_t minsValue, uint8_t secsValue);
 void updateHours(uint8_t value);
 
 /* updates hours, minutes, and seconds all at once */
-void updateTime(uint8_t decHrs, uint8_t decMins, uint8_t decSecs);
+void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs);
 
 /* places a value in the shift register */
 void shiftOut(uint8_t tubeNumber, uint8_t val);

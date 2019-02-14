@@ -11,6 +11,7 @@
 #include "msp.h"
 #include "rtc.h"
 #include "tubes.h"
+#include "circbuf.h"
 
 void configure_SystemClock();
 
@@ -21,5 +22,7 @@ void configure_buttons();
 void configure_leds();
 
 void configure_all_pins();
+
+uint8_t parse_rx_message(CircBuf_t * rxbuf);
 
 #endif

@@ -11,8 +11,30 @@
 #include "tubes.h"
 #include "timer.h"
 #include "circbuf.h"
+#include "peripherals.h"
 
-//extern Mode state;
+
+/* M E S S A G E   M A C R O S */
+
+#define    START_MSG       0xFE
+#define    SET_TIME        0x11
+#define    TEMP_MODE       0x22
+#define    CLOCK_MODE      0x33
+#define    END_MSG         0x0F
+
+/*                  Message Structure
+ * [ START_MSG | START_MSG | FUNCTION | DATA ... DATA | SIZE | END_MSG ]
+ *
+ *                  Time Setting Message
+ * [ START_MSG | START_MSG | SET_TIME | HOURS | MINUTES | END_MSG ]
+ *
+ *               Temp. Mode Request Message
+ * [ START_MSG | START_MSG | TEMP_MODE | TEMP_MODE | END_MSG ]
+ *
+ *             Clock Mode Request Message
+ * [ START_MSG | START_MSG | CLOCK_MODE | CLOCK_MODE | END_MSG ]
+ */
+
 extern uint8_t hours;
 extern uint8_t minutes;
 extern uint8_t seconds;
@@ -23,6 +45,7 @@ extern uint8_t buttonCount;
 extern CircBuf_t * RXBuf;
 extern CircBuf_t * TXBuf;
 
+extern uint8_t parse_request;
 
 
 void configure_SystemClock(){
@@ -118,60 +141,56 @@ void configure_all_pins() {
     P10->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 }
 
-// +/- control
-void PORT5_IRQHandler() {
-    // "+" Button
-    if(P5->IFG & BIT1 && P5->IN & BIT0) {
-        // if rising edge
-        if(P5->IES & BIT1) {
-            P5->IES &= ~BIT1; // set to falling edge
-            doButtons = 0b01;
-            enableSystick(50); // set to 50ms
-        }
+uint8_t parse_rx_message(CircBuf_t * rxbuf) {
+    uint8_t start[2];
+    start[0] = removeItem(rxbuf);
+    start[1] = removeItem(rxbuf);
 
-        // if falling edge
-        else if(P5->IES & ~BIT1) {
-            P5->IES &= BIT1; // set to rising edge
-            doButtons = 0b10;
-            disableSystick();
-            RTCSEC = 0;
-            buttonCount = 0; // reset button count
+    if((start[0] == START_MSG) || (start[1] == START_MSG)) {
+        if(get_length_buf(rxbuf) == 4) {  // set time message, 5 bytes long
+            // set to SETUP mode
+            P2->OUT = BIT2;
+            hours = removeItem(rxbuf);
+            minutes = removeItem(rxbuf);
+            return 1;
+        }
+        else if(get_length_buf(rxbuf) == 3) {
+            uint8_t new_mode[2];
+            new_mode[0] = removeItem(rxbuf);
+            new_mode[1] = removeItem(rxbuf);
+            if((new_mode[0] == TEMP_MODE) || ((new_mode[1] == TEMP_MODE))) {
+                // set to temp mode
+                P2->OUT = BIT0;
+                return 1;
+            }
+            else if((new_mode[0] == CLOCK_MODE) || ((new_mode[1] == CLOCK_MODE))) {
+                // set to clock mode
+                P2->OUT = BIT1;
+                return 1;
+            }
+        }
+        else {
+            return 0;
         }
     }
-
-    // "-" Button
-    if(P5->IFG & BIT2 && P5->IN & BIT0) {
-        // if rising edge
-        if(P5->IES & BIT2) {
-            P5->IES &= ~BIT2; // set to falling edge
-            doButtons = 0b00010000;
-            enableSystick(50); // set to 50ms
-        }
-
-        // if falling edge
-        else if(P5->IES & ~BIT2) {
-            P5->IES &= BIT2; // set to rising edge
-            doButtons = 0b10010000;
-            disableSystick();
-            RTCSEC = 0;
-            buttonCount = 0; // reset button count
-        }
-    }
-    P5->IFG = 0; // clear interrupt flags
+    return 0;
 }
+
 
 // UART interrupts
 void EUSCIA0_IRQHandler(){
     if (EUSCI_A0->IFG & BIT0){
+        if(EUSCI_A0->RXBUF == END_MSG)
+            parse_request = 1;
+        EUSCI_A0->TXBUF = EUSCI_A0->RXBUF; // echo for now
         addItemCircBuf(RXBuf, EUSCI_A0->RXBUF);
     }
     if (EUSCI_A0->IFG & BIT1){
-        //Transmit Stuff
+        //Transmit Everything in TXBuf
         if(isEmpty(TXBuf)) {
             EUSCI_A0->IFG &= ~BIT1;
             return;
         }
-//        sendByte(removeItem(TXBuf));
         EUSCI_A0->TXBUF = removeItem(TXBuf);
     }
 }
