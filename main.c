@@ -67,12 +67,11 @@ void main(void) {
 	/* MAIN LOOP */
 	while(1) {
 	    if(parse_request) {
-	        if(parse_rx_message(RXBuf)) {
+	        uint8_t parse_status = parse_rx_message();
+	        if(parse_status == 1) {     // SET_TIME
 	            update_time(hours, minutes, seconds);
 	        }
-	        else {
-	            resetCircBuf(RXBuf);
-	        }
+	        resetCircBuf(RXBuf);
 	        parse_request == 0;
 	    }
 	}

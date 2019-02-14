@@ -29,10 +29,10 @@
  * [ START_MSG | START_MSG | SET_TIME | HOURS | MINUTES | END_MSG ]
  *
  *               Temp. Mode Request Message
- * [ START_MSG | START_MSG | TEMP_MODE | TEMP_MODE | END_MSG ]
+ * [ START_MSG | START_MSG | TEMP_MODE | END_MSG ]
  *
  *             Clock Mode Request Message
- * [ START_MSG | START_MSG | CLOCK_MODE | CLOCK_MODE | END_MSG ]
+ * [ START_MSG | START_MSG | CLOCK_MODE | END_MSG ]
  */
 
 extern uint8_t hours;
@@ -143,37 +143,42 @@ void configure_all_pins() {
 
 uint8_t parse_rx_message(CircBuf_t * rxbuf) {
     uint8_t start[2];
-    start[0] = removeItem(rxbuf);
-    start[1] = removeItem(rxbuf);
+    uint8_t msg_function;
 
-    if((start[0] == START_MSG) || (start[1] == START_MSG)) {
-        if(get_length_buf(rxbuf) == 4) {  // set time message, 5 bytes long
-            // set to SETUP mode
+    start[0] = removeItem(rxbuf);
+
+    // shift through buffer until START_MSG is found
+    while(start[0] != START_MSG) {
+        start[1] = start[0];
+        start[0] = removeItem(rxbuf);
+    }
+
+    // check for double START_MSG
+    if(start[1] = START_MSG) {
+        msg_function = removeItem(rxbuf);
+
+        if(msg_function == SET_TIME) {
+            // set to setup mode
             P2->OUT = BIT2;
             hours = removeItem(rxbuf);
             minutes = removeItem(rxbuf);
             return 1;
         }
-        else if(get_length_buf(rxbuf) == 3) {
-            uint8_t new_mode[2];
-            new_mode[0] = removeItem(rxbuf);
-            new_mode[1] = removeItem(rxbuf);
-            if((new_mode[0] == TEMP_MODE) || ((new_mode[1] == TEMP_MODE))) {
-                // set to temp mode
-                P2->OUT = BIT0;
-                return 1;
-            }
-            else if((new_mode[0] == CLOCK_MODE) || ((new_mode[1] == CLOCK_MODE))) {
-                // set to clock mode
-                P2->OUT = BIT1;
-                return 1;
-            }
+
+        else if(msg_function == TEMP_MODE))) {
+            // set to temp mode
+            // trigger temp sample
+            P2->OUT = BIT0;
+            return 2;
         }
-        else {
-            return 0;
+
+        else if(msg_function == CLOCK_MODE) {
+            // set to clock mode
+            P2->OUT = BIT1;
+            return 3;
         }
     }
-    return 0;
+    return -1;
 }
 
 
