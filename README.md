@@ -33,15 +33,26 @@ I2C:
 - [x] 10 second timer to trigger temp update
 
 UART and SPI:
-- SPI is nice to have, optional
-- Can send and receive data
+- SPI is nice to have, might be implemented
+- Can send and receive data using:
   - [x] UART
   - [ ] SPI
 - Commands/Messages:
-  - [ ] Set Time -> 0x11 followed by 0xHHMMSS
-  - [ ] Reqest Temp Mode -> 0x22
-  - [ ] request Clock Mode -> 0x33
-  - [ ] ACK -> 0x44
-  - [ ] NACK -> 0x55
+  - [x] Set Time -> 0x11 followed by 0xHHMMSS
+  - [x] Reqest Temp Mode -> 0x22
+  - [x] request Clock Mode -> 0x33
+  
+                         Message Structure
+  [ START_MSG | START_MSG | FUNCTION | DATA ... DATA | SIZE | END_MSG ]
+ 
+                   Time Setting Message
+  [ START_MSG | START_MSG | SET_TIME | HOURS | MINUTES | END_MSG ]
+ 
+                Temp. Mode Request Message
+  [ START_MSG | START_MSG | TEMP_MODE | END_MSG ]
+ 
+              Clock Mode Request Message
+ [ START_MSG | START_MSG | CLOCK_MODE | END_MSG ]
+
 
 Power Management -> Shift Regs -> Switches and Buttons -> I2C -> UART and SPI 
