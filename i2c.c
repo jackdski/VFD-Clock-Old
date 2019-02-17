@@ -46,6 +46,45 @@ uint8_t tx_size = 0;
 //uint8_t rx_size = 0;
 
 
+/* need to do a read modify write. */
+void writeRegister(uint8_t reg, uint8_t value){
+
+    //while(UCB3STATW & UCBBUSY); // wait while busy
+    while(UCB3CTLW0 & UCTXSTT); //soon as this is no longer true send the next thing
+    UCB3CTL0 |= UCTR | UCTXSTT;
+
+    while(UCB3CTLW0 & UCTXSTT); //soon as this is no longer true send the next thing
+    UCB3TXBUF = reg;
+    while(!(UCB3IFG & UCTXIFG0)); //when empty send next thing
+
+    UCB3TXBUF = value;
+    while(!(UCB3IFG & UCTXIFG0)); //when empty send next thing
+    UCB3CTL0 |= UCTXSTP;
+}
+
+uint8_t readRegister(uint8_t reg){
+
+    while(UCB3STAT & UCBBUSY); //wait if busy
+       UCB3CTL0 |= UCTR | UCTXSTT;
+
+    while(UCB3CTLW0 & UCTXSTT);
+       UCB3TXBUF = reg;
+    while(!(UCB3IFG & UCTXIFG0)); //wait until buf is transmitted
+
+       /* read and repeat start */
+       UCB3CTL0 &= ~UCTR;
+       UCB3CTL0 |= UCTXSTT;
+
+       while(UCB3CTLW0 & UCTXSTT);
+     //  while(!(UCB3IFG & UCRXIFG0));
+       UCB3CTL0 |= UCTXSTP;
+       /* collect the bytes requested, stuff into array, then send stop*/
+       uint8_t rxValue = UCB3RXBUF;
+       while(UCB3CTLW0 & UCTXSTP); //clear after stop been set and come out.
+
+       return rxValue;
+}
+
 void configure_i2c(){
     /*
      * UCB0SDA -> P1.6
@@ -53,36 +92,53 @@ void configure_i2c(){
      */
 
     // configure GPIO
-    P1->SEL0 &= ~(BIT6 | BIT7);
-    P1->SEL1 |= (BIT6 | BIT7);
+//    P1->SEL0 &= ~(BIT6 | BIT7);
+//    P1->SEL1 |= (BIT6 | BIT7);
+    P1->SEL0 |= BIT6 | BIT7;                // I2C pins
 
     EUSCI_B0->CTLW0 |= (EUSCI_B_CTLW0_SWRST); // unlock
 
     // I2C mode, Synchronous mode, Master Mode, SMCLK mode
-    EUSCI_B0->CTLW0 = ( EUSCI_B_CTLW0_SWRST | EUSCI_B_CTLW0_MODE_3 | EUSCI_B_CTLW0_SYNC | EUSCI_B_CTLW0_MST | EUSCI_B_CTLW0_UCSSEL_2);
+    EUSCI_B0->CTLW0 = ( EUSCI_B_CTLW0_SWRST);
+    EUSCI_B0->CTLW0 = ( EUSCI_B_CTLW0_SWRST |
+            EUSCI_B_CTLW0_MODE_3 |
+            EUSCI_B_CTLW0_SYNC |
+            EUSCI_B_CTLW0_MST |
+            EUSCI_B_CTLW0_SSEL__SMCLK);
 
-    // disable START condition, do not generate STOP, single master, using 7-bit addy's
-    EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_TXSTT | EUSCI_B_CTLW0_TXSTP | EUSCI_B_CTLW0_MM | EUSCI_B_CTLW0_SLA10 | EUSCI_B_CTLW0_A10);
+    // disable START condition, do not generate STOP,
+    //  single master, using 7-bit addy's
+//    EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_TXSTT |
+//            EUSCI_B_CTLW0_TXSTP |
+//            EUSCI_B_CTLW0_MM |
+//            EUSCI_B_CTLW0_SLA10 |
+//            EUSCI_B_CTLW0_A10);
 
     EUSCI_B0->I2CSA = MPL3115A2;  // load MPL3115A2's address
     EUSCI_B0->BRW = 0x001E;  // SMCLK /30 <= 400kHz
 
     EUSCI_B0->CTLW0 &= ~(EUSCI_B_CTLW0_SWRST);  // lock
 
-    EUSCI_B0->IE = (EUSCI_B_IE_RXIE | EUSCI_B_IE_TXIE | EUSCI_B_IE_NACKIE | EUSCI_B_IE_STPIE); // enable RX, TX, and NACK interrupts
+    // enable RX, TX, and NACK interrupts
+    EUSCI_B0->IE = (EUSCI_B_IE_RXIE |
+            EUSCI_B_IE_TXIE |
+            EUSCI_B_IE_NACKIE);
+
     EUSCI_B0->IFG = 0; // clear flags
 //    NVIC_EnableIRQ(EUSCIB0_IRQn);
     NVIC->ISER[0] = 1 << ((EUSCIB0_IRQn) & 31);
 }
 
-//void write_i2c(uint8_t reg, uint8_t val) {
-//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write/transmitter
-//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
-//    EUSCI_B0->TXBUF = reg;
-//    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);
-//    EUSCI_B0->TXBUF = val;
-//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;     // send stop
-//}
+void write_i2c(uint8_t reg, uint8_t val) {
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write/transmitter
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
+    EUSCI_B0->TXBUF = reg;
+    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));
+    EUSCI_B0->TXBUF = val;
+    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;     // send stop
+//    while (EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTP);
+}
 //
 //void read_i2c(uint8_t msg, uint8_t bytes) {
 //    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write/transmitter
@@ -96,25 +152,39 @@ void configure_i2c(){
 //    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;          // send stop
 //}
 
+//void write_byte_i2c(uint8_t reg) {
+////    uint16_t txieStatus = EUSCI_B0->IE & UCTXIE; // store current TXIE status
+////    EUSCI_B0->IE &= ~(UCTXIE_OFS);
+//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write
+//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
+//    while(EUSCI_B0->IFG & EUSCI_B_IFG_STTIFG);
+//    EUSCI_B0->TXBUF = reg;     // write to reg
+//    while(EUSCI_B0->IFG & UCTXIFG);
+//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;  // send stop
+//    while (EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTP);
+////    EUSCI_B0->IFG &= ~UCTXIFG;
+////    EUSCI_B0->IE |= txieStatus;
+//}
+
 void write_byte_i2c(uint8_t reg) {
-    uint16_t txieStatus = EUSCI_B0->IE & UCTXIE; // store current TXIE status
-    EUSCI_B0->IE &= ~(UCTXIE_OFS);
+    uint8_t err = 0;
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
-    EUSCI_B0->IFG |= UCTXIFG;
-    while(EUSCI_B0->IFG & UCTXIFG);
-//    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);
-    EUSCI_B0->TXBUF = reg;     // write to reg
-    while(EUSCI_B0->IFG & UCTXIFG);
-    EUSCI_B0->IFG |= UCTXIFG;
-    while(EUSCI_B0->IFG & UCTXIFG);
-//    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));
-//    EUSCI_B0->TXBUF = value;   // write to reg
-//    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));
-    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;  // send stop
-    EUSCI_B0->IFG &= ~UCTXIFG;
-    EUSCI_B0->IE |= txieStatus;
+    while((EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT ) && (EUSCI_B0->IFG & & UCTXIFG) == 0);
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;
+    EUSCI_B0->TXBUF = reg;
 }
+
+
+//void write_byte_i2c(uint8_t reg) {
+//    while(EUSCI_B0->STATW & EUSCI_B_STATW_BBUSY);
+//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;        // set to write
+//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;     // send start and addy
+//
+//    EUSCI_B0->TXBUF = reg;
+//    while(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0);
+//    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;  // send stop
+//}
 
 void read_byte_i2c(uint8_t reg){
     addItemCircBuf(TXBuf_i2c, reg);

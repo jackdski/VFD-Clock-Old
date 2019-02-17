@@ -24,6 +24,9 @@
 #define WHO_AM_I            0x0C
 #define CTRL_REG1           0x26
 
+
+void writeRegister( uint8_t reg, uint8_t value);
+uint8_t readRegister(uint8_t reg);
 void configure_i2c();
 void write_i2c(uint8_t reg, uint8_t val);
 void read_i2c(uint8_t msg, uint8_t bytes);

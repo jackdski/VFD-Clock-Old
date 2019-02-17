@@ -64,13 +64,15 @@ void main(void) {
 
 	__enable_irq();
     P1->OUT &= ~BIT0;
-    uint8_t temp;
+    uint32_t temp;
 	/* MAIN LOOP */
 	while(1) {
 //	    temp = read_temp_f();
 //	    send_byte(temp); // not sent in ASCII
-	    write_byte_i2c(0xAA);
+//	    write_byte_i2c(0xAA);
+	    readRegister(0x04);
+//	    write_i2c(0xAA, 0xFF);
 	    int i;
-	    for(i=0;i < 100000; i++);
+	    for(i=0;i < 1000000; i++);
 	}
 }
