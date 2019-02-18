@@ -165,7 +165,7 @@ uint8_t parse_rx_message(CircBuf_t * rxbuf) {
             return 1;
         }
 
-        else if(msg_function == TEMP_MODE))) {
+        else if(msg_function == TEMP_MODE) {
             // set to temp mode
             // trigger temp sample
             P2->OUT = BIT0;

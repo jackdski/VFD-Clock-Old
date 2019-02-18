@@ -67,9 +67,19 @@ void main(void) {
 	/* MAIN LOOP */
 	while(1) {
 	    if(parse_request) {
-	        uint8_t parse_status = parse_rx_message();
+	        uint8_t parse_status = parse_rx_message(RXBuf);
 	        if(parse_status == 1) {     // SET_TIME
 	            update_time(hours, minutes, seconds);
+	            P2->OUT = BIT0;
+	        }
+	        else if (parse_status == 2){
+                P2->OUT = BIT1;
+	        }
+	        else if (parse_status == 3) {
+                P2->OUT = BIT2;
+	        }
+	        else {
+	            P2->OUT = 0;
 	        }
 	        resetCircBuf(RXBuf);
 	        parse_request == 0;

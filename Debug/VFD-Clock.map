@@ -1,10 +1,10 @@
 ******************************************************************************
                   TI ARM Linker Unix v18.1.2                   
 ******************************************************************************
->> Linked Thu Feb 14 01:17:41 2019
+>> Linked Sun Feb 17 15:45:51 2019
 
 OUTPUT FILE NAME:   <VFD-Clock.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 00001339
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000133d
 
 
 MEMORY CONFIGURATION
@@ -42,30 +42,30 @@ section   page    origin      length       input sections
                   00000000    000000e4     startup_msp432p401r_ccs.obj (.intvecs:retain)
 
 .text      0    000000e8    00001320     
-                  000000e8    0000042c     peripherals.obj (.text)
-                  00000514    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : pre_init.c.obj (.text:_system_pre_init)
-                  00000518    000003ae     system_msp432p401r.obj (.text)
-                  000008c6    00000002     rtsv7M4_T_le_v4SPD16_eabi.lib : _lock.c.obj (.text:_nop)
-                  000008c8    00000340     tubes.obj (.text)
-                  00000c08    00000196     rtc.obj (.text)
-                  00000d9e    00000002     --HOLE-- [fill = 0]
-                  00000da0    00000182     circbuf.obj (.text)
-                  00000f22    00000002     --HOLE-- [fill = 0]
-                  00000f24    000000d8     rtsv7M4_T_le_v4SPD16_eabi.lib : memory.c.obj (.text:free)
-                  00000ffc    00000004                                   : exit.c.obj (.text:abort:abort)
-                  00001000    000000a8     timer.obj (.text)
-                  000010a8    0000009c     rtsv7M4_T_le_v4SPD16_eabi.lib : memcpy_t2.asm.obj (.text)
-                  00001144    00000004     --HOLE-- [fill = 0]
-                  00001148    00000090     main.obj (.text)
-                  000011d8    00000078     rtsv7M4_T_le_v4SPD16_eabi.lib : memory.c.obj (.text:malloc)
-                  00001250    00000068                                   : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
-                  000012b8    00000044                                   : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit:__TI_auto_init_nobinit_nopinit)
-                  000012fc    0000003c                                   : memory.c.obj (.text:minsert)
-                  00001338    00000038                                   : boot_cortex_m.c.obj (.text:_c_int00_noargs:_c_int00_noargs)
-                  00001370    00000038                                   : memory.c.obj (.text:minit)
-                  000013a8    00000028                                   : memory.c.obj (.text:mremove)
-                  000013d0    00000012                                   : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
-                  000013e2    00000006     --HOLE-- [fill = 0]
+                  000000e8    00000404     peripherals.obj (.text)
+                  000004ec    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : pre_init.c.obj (.text:_system_pre_init)
+                  000004f0    000003ae     system_msp432p401r.obj (.text)
+                  0000089e    00000002     rtsv7M4_T_le_v4SPD16_eabi.lib : _lock.c.obj (.text:_nop)
+                  000008a0    00000340     tubes.obj (.text)
+                  00000be0    00000196     rtc.obj (.text)
+                  00000d76    00000002     --HOLE-- [fill = 0]
+                  00000d78    00000182     circbuf.obj (.text)
+                  00000efa    00000002     --HOLE-- [fill = 0]
+                  00000efc    000000d8     rtsv7M4_T_le_v4SPD16_eabi.lib : memory.c.obj (.text:free)
+                  00000fd4    00000004                                   : exit.c.obj (.text:abort:abort)
+                  00000fd8    000000be     main.obj (.text)
+                  00001096    00000002     --HOLE-- [fill = 0]
+                  00001098    000000a8     timer.obj (.text)
+                  00001140    0000009c     rtsv7M4_T_le_v4SPD16_eabi.lib : memcpy_t2.asm.obj (.text)
+                  000011dc    00000078                                   : memory.c.obj (.text:malloc)
+                  00001254    00000068                                   : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
+                  000012bc    00000044                                   : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit:__TI_auto_init_nobinit_nopinit)
+                  00001300    0000003c                                   : memory.c.obj (.text:minsert)
+                  0000133c    00000038                                   : boot_cortex_m.c.obj (.text:_c_int00_noargs:_c_int00_noargs)
+                  00001374    00000038                                   : memory.c.obj (.text:minit)
+                  000013ac    00000028                                   : memory.c.obj (.text:mremove)
+                  000013d4    00000012                                   : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
+                  000013e6    00000002     --HOLE-- [fill = 0]
                   000013e8    00000012     startup_msp432p401r_ccs.obj (.text)
                   000013fa    0000000e     rtsv7M4_T_le_v4SPD16_eabi.lib : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
 
@@ -105,16 +105,16 @@ MODULE SUMMARY
        Module                        code   ro data   rw data
        ------                        ----   -------   -------
     ./
-       peripherals.obj               1068   0         0      
+       peripherals.obj               1028   0         0      
        system_msp432p401r.obj        942    0         8      
        tubes.obj                     832    0         0      
        rtc.obj                       406    0         0      
        circbuf.obj                   386    0         0      
        startup_msp432p401r_ccs.obj   18     228       0      
-       main.obj                      144    0         28     
+       main.obj                      190    0         28     
        timer.obj                     168    0         0      
     +--+-----------------------------+------+---------+---------+
-       Total:                        3964   228       36     
+       Total:                        3970   228       36     
                                                              
     /home/jack/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/lib/rtsv7M4_T_le_v4SPD16_eabi.lib
        memory.c.obj                  492    0         24     
@@ -134,7 +134,7 @@ MODULE SUMMARY
        Stack:                        0      0         1024   
        Linker Generated:             0      60        0      
     +--+-----------------------------+------+---------+---------+
-       Grand Total:                  4882   288       3148   
+       Grand Total:                  4888   288       3148   
 
 
 LINKER GENERATED COPY TABLES
@@ -159,7 +159,7 @@ address   name
 000013f9  ADC14_IRQHandler              
 000013f9  AES256_IRQHandler             
 000013f9  BusFault_Handler              
-00000ffd  C$$EXIT                       
+00000fd5  C$$EXIT                       
 000013f9  COMP_E0_IRQHandler            
 000013f9  COMP_E1_IRQHandler            
 000013f9  CS_IRQHandler                 
@@ -170,8 +170,8 @@ address   name
 000013f9  DMA_INT3_IRQHandler           
 000013f9  DebugMon_Handler              
 000013f9  Default_Handler               
-00000499  EUSCIA0_IRQHandler            
-00000499  EUSCIA0_IRQHandler            
+00000471  EUSCIA0_IRQHandler            
+00000471  EUSCIA0_IRQHandler            
 000013f9  EUSCIA1_IRQHandler            
 000013f9  EUSCIA2_IRQHandler            
 000013f9  EUSCIA3_IRQHandler            
@@ -193,16 +193,16 @@ address   name
 000013f9  PORT6_IRQHandler              
 000013f9  PSS_IRQHandler                
 000013f9  PendSV_Handler                
-00000c81  RTC_C_IRQHandler              
-00000c81  RTC_C_IRQHandler              
+00000c59  RTC_C_IRQHandler              
+00000c59  RTC_C_IRQHandler              
 20000420  RXBuf                         
 000013e9  Reset_Handler                 
 000013f9  SVC_Handler                   
-00001039  SysTick_Handler               
-00001039  SysTick_Handler               
+000010d1  SysTick_Handler               
+000010d1  SysTick_Handler               
 2000041c  SystemCoreClock               
-00000599  SystemCoreClockUpdate         
-00000519  SystemInit                    
+00000571  SystemCoreClockUpdate         
+000004f1  SystemInit                    
 000013f9  T32_INT1_IRQHandler           
 000013f9  T32_INT2_IRQHandler           
 000013f9  T32_INTC_IRQHandler           
@@ -225,70 +225,70 @@ address   name
 00001448  __TI_CINIT_Limit              
 00001420  __TI_Handler_Table_Base       
 0000142c  __TI_Handler_Table_Limit      
-000012b9  __TI_auto_init_nobinit_nopinit
-00001251  __TI_decompress_lzss          
+000012bd  __TI_auto_init_nobinit_nopinit
+00001255  __TI_decompress_lzss          
 000013fb  __TI_decompress_none          
 ffffffff  __TI_pprof_out_hndl           
 ffffffff  __TI_prof_data_size           
 ffffffff  __TI_prof_data_start          
 00000000  __TI_static_base__            
-000013d1  __TI_zero_init_nomemset       
-000010a9  __aeabi_memcpy                
-000010a9  __aeabi_memcpy4               
-000010a9  __aeabi_memcpy8               
+000013d5  __TI_zero_init_nomemset       
+00001141  __aeabi_memcpy                
+00001141  __aeabi_memcpy4               
+00001141  __aeabi_memcpy8               
 ffffffff  __binit__                     
 ffffffff  __c_args__                    
 UNDEFED   __mpu_init                    
 2000fe00  __stack                       
-00001339  _c_int00_noargs               
+0000133d  _c_int00_noargs               
 2000040c  _lock                         
-000008c7  _nop                          
+0000089f  _nop                          
 20000000  _sys_memory                   
 UNDEFED   _system_post_cinit            
-00000515  _system_pre_init              
+000004ed  _system_pre_init              
 20000410  _unlock                       
-00000ffd  abort                         
-00000e21  addItemCircBuf                
-00000909  assignPin                     
+00000fd5  abort                         
+00000df9  addItemCircBuf                
+000008e1  assignPin                     
 ffffffff  binit                         
 20000418  buttonCount                   
-00000461  configure_SystemClock         
-00000361  configure_all_pins            
-000002e1  configure_buttons             
-00000259  configure_leds                
-00000c09  configure_rtc                 
-00000b91  configure_shift_pins          
-000001c1  configure_uart                
-00000ee9  createCircBuf                 
-000008c9  decToSevSeg                   
-00000ed1  deleteCircBuf                 
-00000b59  disableOutput                 
-00001021  disableSystick                
+00000439  configure_SystemClock         
+00000339  configure_all_pins            
+000002b9  configure_buttons             
+00000231  configure_leds                
+00000be1  configure_rtc                 
+00000b69  configure_shift_pins          
+00000199  configure_uart                
+00000ec1  createCircBuf                 
+000008a1  decToSevSeg                   
+00000ea9  deleteCircBuf                 
+00000b31  disableOutput                 
+000010b9  disableSystick                
 20000417  doButtons                     
-00000b21  enableOutput                  
-00001001  enableSystick                 
-00000f25  free                          
-00000ec9  get_length_buf                
+00000af9  enableOutput                  
+00001099  enableSystick                 
+00000efd  free                          
+00000ea1  get_length_buf                
 20000414  hours                         
 00000000  interruptVectors              
-00000eb9  isEmpty                       
-00000e09  isFullCircBuf                 
-00000e59  loadToBuf                     
-00001149  main                          
-000011d9  malloc                        
-000010a9  memcpy                        
-00001371  minit                         
+00000e91  isEmpty                       
+00000de1  isFullCircBuf                 
+00000e31  loadToBuf                     
+00000fd9  main                          
+000011dd  malloc                        
+00001141  memcpy                        
+00001375  minit                         
 20000415  minutes                       
 20000419  parse_request                 
 000000e9  parse_rx_message              
-00000941  pulseClock                    
-00000dd1  removeItem                    
-00000da1  resetCircBuf                  
+00000919  pulseClock                    
+00000da9  removeItem                    
+00000d79  resetCircBuf                  
 20000416  seconds                       
-00000961  shiftOut                      
-00000aa1  updateMinutes                 
-00000a51  updateSeconds                 
-00000991  update_time                   
+00000939  shiftOut                      
+00000a79  updateMinutes                 
+00000a29  updateSeconds                 
+00000969  update_time                   
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -298,59 +298,59 @@ address   name
 00000000  __TI_static_base__            
 00000000  interruptVectors              
 000000e9  parse_rx_message              
-000001c1  configure_uart                
+00000199  configure_uart                
 00000200  __STACK_SIZE                  
-00000259  configure_leds                
-000002e1  configure_buttons             
-00000361  configure_all_pins            
+00000231  configure_leds                
+000002b9  configure_buttons             
+00000339  configure_all_pins            
 00000400  __SYSMEM_SIZE                 
-00000461  configure_SystemClock         
-00000499  EUSCIA0_IRQHandler            
-00000499  EUSCIA0_IRQHandler            
-00000515  _system_pre_init              
-00000519  SystemInit                    
-00000599  SystemCoreClockUpdate         
-000008c7  _nop                          
-000008c9  decToSevSeg                   
-00000909  assignPin                     
-00000941  pulseClock                    
-00000961  shiftOut                      
-00000991  update_time                   
-00000a51  updateSeconds                 
-00000aa1  updateMinutes                 
-00000b21  enableOutput                  
-00000b59  disableOutput                 
-00000b91  configure_shift_pins          
-00000c09  configure_rtc                 
-00000c81  RTC_C_IRQHandler              
-00000c81  RTC_C_IRQHandler              
-00000da1  resetCircBuf                  
-00000dd1  removeItem                    
-00000e09  isFullCircBuf                 
-00000e21  addItemCircBuf                
-00000e59  loadToBuf                     
-00000eb9  isEmpty                       
-00000ec9  get_length_buf                
-00000ed1  deleteCircBuf                 
-00000ee9  createCircBuf                 
-00000f25  free                          
-00000ffd  C$$EXIT                       
-00000ffd  abort                         
-00001001  enableSystick                 
-00001021  disableSystick                
-00001039  SysTick_Handler               
-00001039  SysTick_Handler               
-000010a9  __aeabi_memcpy                
-000010a9  __aeabi_memcpy4               
-000010a9  __aeabi_memcpy8               
-000010a9  memcpy                        
-00001149  main                          
-000011d9  malloc                        
-00001251  __TI_decompress_lzss          
-000012b9  __TI_auto_init_nobinit_nopinit
-00001339  _c_int00_noargs               
-00001371  minit                         
-000013d1  __TI_zero_init_nomemset       
+00000439  configure_SystemClock         
+00000471  EUSCIA0_IRQHandler            
+00000471  EUSCIA0_IRQHandler            
+000004ed  _system_pre_init              
+000004f1  SystemInit                    
+00000571  SystemCoreClockUpdate         
+0000089f  _nop                          
+000008a1  decToSevSeg                   
+000008e1  assignPin                     
+00000919  pulseClock                    
+00000939  shiftOut                      
+00000969  update_time                   
+00000a29  updateSeconds                 
+00000a79  updateMinutes                 
+00000af9  enableOutput                  
+00000b31  disableOutput                 
+00000b69  configure_shift_pins          
+00000be1  configure_rtc                 
+00000c59  RTC_C_IRQHandler              
+00000c59  RTC_C_IRQHandler              
+00000d79  resetCircBuf                  
+00000da9  removeItem                    
+00000de1  isFullCircBuf                 
+00000df9  addItemCircBuf                
+00000e31  loadToBuf                     
+00000e91  isEmpty                       
+00000ea1  get_length_buf                
+00000ea9  deleteCircBuf                 
+00000ec1  createCircBuf                 
+00000efd  free                          
+00000fd5  C$$EXIT                       
+00000fd5  abort                         
+00000fd9  main                          
+00001099  enableSystick                 
+000010b9  disableSystick                
+000010d1  SysTick_Handler               
+000010d1  SysTick_Handler               
+00001141  __aeabi_memcpy                
+00001141  __aeabi_memcpy4               
+00001141  __aeabi_memcpy8               
+00001141  memcpy                        
+000011dd  malloc                        
+00001255  __TI_decompress_lzss          
+000012bd  __TI_auto_init_nobinit_nopinit
+0000133d  _c_int00_noargs               
+00001375  minit                         
+000013d5  __TI_zero_init_nomemset       
 000013e9  Reset_Handler                 
 000013f9  ADC14_IRQHandler              
 000013f9  AES256_IRQHandler             
