@@ -154,7 +154,7 @@ uint8_t parse_rx_message(CircBuf_t * rxbuf) {
     }
 
     // check for double START_MSG
-    if(start[1] = START_MSG) {
+    if(start[1] == START_MSG) {
         msg_function = removeItem(rxbuf);
 
         if(msg_function == SET_TIME) {
@@ -178,7 +178,7 @@ uint8_t parse_rx_message(CircBuf_t * rxbuf) {
             return 3;
         }
     }
-    return -1;
+    return 0;
 }
 
 
