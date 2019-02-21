@@ -5,7 +5,7 @@ Clean up branches from comments and formatting:
 - [x] Power Management
 - [x] Shift Reg
 - [x] Switchs/Buttons
-- [ ] I2C
+- [x] I2C
 - [ ] UART and SPI
 
 
@@ -27,9 +27,9 @@ Switches and Buttons:
 - [x] 50ms timer
   
 I2C:
-- [ ] Send Data
-- [ ] Receive Data
-- [ ] Sample and Record Temperature
+- [x] Send Data
+- [x] Receive Data
+- [x] Sample and Record Temperature
 - [x] 10 second timer to trigger temp update
 
 UART and SPI:
