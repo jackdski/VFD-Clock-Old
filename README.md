@@ -31,6 +31,7 @@ I2C:
 - [x] Receive Data
 - [x] Sample and Record Temperature
 - [x] 10 second timer to trigger temp update
+- [x] 400kHz
 
 UART and SPI:
 - SPI is nice to have, might be implemented
