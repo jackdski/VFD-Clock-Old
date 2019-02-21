@@ -35,22 +35,18 @@
 
 /* 1-6 for select tubes, 7 for all */
 void disable_output(uint8_t target) {
-    if(target == 7) {
+    if(target == 7)
         P3->OUT |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
-    }
-    else {
+    else
         P3->OUT |= BIT(target-1);
-    }
 }
 
 /* Enable the output from the shift register */
 void enable_output(uint8_t tube) {
-    if(tube == 7) {
+    if(tube == 7)
         P3->OUT &= ~( BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 );
-    }
-    else {
+    else
         P3->OUT &= ~BIT(tube-1);
-    }
 }
 
 /* Pulse clock pin to shift a bit in the shift registers  */
@@ -85,8 +81,7 @@ void configure_shift_pins() {
 
 
 /* returns a value that will show the input value
- * in the uint8_t on 7-seg display
- */
+ * in the uint8_t on 7-seg display */
 uint8_t dec_to_sev_seg(uint8_t value) {
     switch(value) {
         case 0: return ZERO;
@@ -116,12 +111,13 @@ void update_seconds(uint8_t decSecs) {
     uint8_t segSecsOne = dec_to_sev_seg(decSecs / 10);
     uint8_t segSecsTwo = dec_to_sev_seg(decSecs % 10);
 
-    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 low
+    P4->OUT |= (BIT1);              // latch (!SRCLR), set P4.1 low
 
+    // write the values to shift registers
     shift_out(5, segSecsOne);
     shift_out(6, segSecsTwo);
 
-    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) low again
+    P4->OUT &= ~(BIT1);             // set latch (!SRCLR0) low again
 }
 
 /* updates only the two tubes related to minutes */
@@ -131,21 +127,22 @@ void update_minutes(uint8_t decMins, uint8_t decSecs) {
     uint8_t segSecsOne = dec_to_sev_seg(decSecs / 10);
     uint8_t segSecsTwo = dec_to_sev_seg(decSecs % 10);
 
-    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 high
+    P4->OUT |= (BIT1);              // latch (!SRCLR), set P4.1 high
 
-    // write the values to the tubes
+    // write the values to shift registers
     shift_out(3, segMinsOne);
     shift_out(4, segMinsTwo);
     shift_out(5, segSecsOne);
     shift_out(6, segSecsTwo);
 
-    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) high again
+    P4->OUT &= ~(BIT1);             // set latch (!SRCLR0) high again
 }
 
 /* updates hours, minutes, and seconds */
 void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
-    P4->OUT &= ~(BIT1); // latch (!SRCLR), set P4.1 low
+    P4->OUT &= ~(BIT1);             // latch (!SRCLR), set P4.1 low
 
+    // convert from decimal to seven segment binary
     uint8_t segHrsOne = dec_to_sev_seg(decHrs / 10);
     uint8_t segHrsTwo = dec_to_sev_seg(decHrs % 10);
     uint8_t segMinsOne = dec_to_sev_seg(decMins / 10);
@@ -153,7 +150,7 @@ void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     uint8_t segSecsOne = dec_to_sev_seg(decSecs / 10);
     uint8_t segSecsTwo = dec_to_sev_seg(decSecs % 10);
 
-    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 high
+    P4->OUT |= (BIT1);              // latch (!SRCLR), set P4.1 high
 
     // write the values to the tubes
     shift_out(1, segHrsOne);
@@ -163,28 +160,28 @@ void update_time(uint8_t decHrs, uint8_t decMins, uint8_t decSecs) {
     shift_out(5, segSecsOne);
     shift_out(6, segSecsTwo);
 
-    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) low again
+    P4->OUT &= ~(BIT1);             // set latch (!SRCLR0) low again
 }
 
 
-/* updates the temperature to display '  ##oF  ' */
+/* updates the temperature to display '  ##oF' */
 void update_temperature(uint8_t temperature) {
     uint8_t temperatureOne = dec_to_sev_seg(temperature / 10);
     uint8_t temperatureTwo = dec_to_sev_seg(temperature % 10);
     uint8_t degrees = DEGREES;
     uint8_t letter_f = LETTER_F;
 
-    P4->OUT |= (BIT1); // latch (!SRCLR), set P4.1 high
+    P4->OUT |= (BIT1);              // latch (!SRCLR), set P4.1 high
 
-    // first two blank
-    shift_out(1, 0);
-    shift_out(2, 0);
+    // write to shift registers
+    shift_out(1, 0);                //  blank
+    shift_out(2, 0);                //  blank
     shift_out(3, temperatureOne);   //  #
     shift_out(4, temperatureTwo);   //  #
     shift_out(5, degrees);          //  degrees
     shift_out(6, letter_f);         //  letter_f
 
-    P4->OUT &= ~(BIT1);    // set latch (!SRCLR0) low again
+    P4->OUT &= ~(BIT1);             // set latch (!SRCLR0) low again
 }
 
 
@@ -192,9 +189,8 @@ void update_temperature(uint8_t temperature) {
 void shift_out(uint8_t tubeNumber, uint8_t val) {
     uint8_t i;
     for(i = 0; i < 8; i++) {
-        assign_pin(tubeNumber, (val & (1 << i))); // P4.2 (SER) for tube 1
-//        P4->OUT ^= BIT2; // test value
-        pulse_clock(); // P4.0
+        assign_pin(tubeNumber, (val & (1 << i)));   // P4.2 (SER) for tube 1
+        pulse_clock();                              // P4.0
     }
     P6->OUT &= ~(BIT1);
 }

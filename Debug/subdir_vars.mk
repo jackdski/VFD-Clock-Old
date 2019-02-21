@@ -8,6 +8,7 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../circbuf.c \
+../i2c.c \
 ../main.c \
 ../peripherals.c \
 ../power_modes.c \
@@ -19,6 +20,7 @@ C_SRCS += \
 
 C_DEPS += \
 ./circbuf.d \
+./i2c.d \
 ./main.d \
 ./peripherals.d \
 ./power_modes.d \
@@ -30,6 +32,7 @@ C_DEPS += \
 
 OBJS += \
 ./circbuf.obj \
+./i2c.obj \
 ./main.obj \
 ./peripherals.obj \
 ./power_modes.obj \
@@ -41,6 +44,7 @@ OBJS += \
 
 OBJS__QUOTED += \
 "circbuf.obj" \
+"i2c.obj" \
 "main.obj" \
 "peripherals.obj" \
 "power_modes.obj" \
@@ -52,6 +56,7 @@ OBJS__QUOTED += \
 
 C_DEPS__QUOTED += \
 "circbuf.d" \
+"i2c.d" \
 "main.d" \
 "peripherals.d" \
 "power_modes.d" \
@@ -63,6 +68,7 @@ C_DEPS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../circbuf.c" \
+"../i2c.c" \
 "../main.c" \
 "../peripherals.c" \
 "../power_modes.c" \

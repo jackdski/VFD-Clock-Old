@@ -14,6 +14,7 @@
 #include "rtc.h"
 #include "timer.h"
 #include "tubes.h"
+#include "i2c.h"
 
 
 /* --- G L O B A L   V A R I A B L E S --- */
@@ -60,12 +61,13 @@ void main(void) {
     // configuration function calls
 	//configure_all_pins();
 	configure_SystemClock();
-	configure_rtc();
+//	configure_rtc();
 	configure_uart();
 	configure_buttons();
 	configure_leds();
 	configure_shift_pins();
 	configure_temperature_timer();
+	configure_i2c();
 
 	__enable_irq();
 
@@ -89,13 +91,18 @@ void main(void) {
             }
         }
         else if(switch_select == Temperature) {
-            // need to add way of reset timer_count
+            // need to add way of reseting timer_count
+
+            set_mode_active();      // set temperature sensor active
+            set_oversample_rate(7); // set oversample rate
+            enable_event_flags();   // enable temperature sensor events
+
             if(temperature_update_request == 1) {
-                // temperature = ...    // get temp
-                // update_temperature(); // put latest temperature on display
-                P2->OUT ^= BIT2; // just blink for now instead of temperature sample
+                temperature = read_temp_f();    // get temperature
+                update_temperature(temperature);// put latest temperature on display
                 temperature_update_request = 0;
             }
+            set_mode_standby();
         }
 	}
 }
