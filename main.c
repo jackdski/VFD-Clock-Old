@@ -5,11 +5,6 @@
  *  main.c
  */
 
-#define     MAIN /* runs main loop */
-#define     RUN_SETUP /* runs setup on startup */
-//#define     SHIFT_REG_TEST  // displays 0-9 continuously
-//#define     UART_TEST       // if a msg is properly receive light an LED
-//#define     BUTTONS_TEST    // '+' = blue light toggle, '-' = green light toggle
 
 #include "msp.h"
 #include "rtc.h"
@@ -64,15 +59,20 @@ void main(void) {
 
 	__enable_irq();
     P1->OUT &= ~BIT0;
-    uint32_t temp;
+    uint8_t temp;
+
+    set_mode_active();      // set temp sensor active
+    set_oversample_rate(7); // set oversample rate
+    enableEventFlags();     // enable temp sensor event flags
+
+
 	/* MAIN LOOP */
 	while(1) {
-//	    temp = read_temp_f();
-//	    send_byte(temp); // not sent in ASCII
-//	    write_byte_i2c(0xAA);
-	    readRegister(0x04);
-//	    write_i2c(0xAA, 0xFF);
+//        readRegister(0x00);   // status
+//        readRegister(0x00);   // status
+	    temp = read_temp_c();   // get temp
 	    int i;
-	    for(i=0;i < 1000000; i++);
+	    for(i=0;i < 100000; i++);
+
 	}
 }
