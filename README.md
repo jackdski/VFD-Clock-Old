@@ -6,13 +6,13 @@ Clean up branches from comments and formatting:
 - [x] Shift Reg
 - [x] Switchs/Buttons
 - [x] I2C
-- [ ] UART and SPI
+- [ ] UART
 
 
 Power Management:
 - Goes to sleep:
   - [x] inbetween RTC updates
-  - [ ] inbetween temp sensor reads
+  - [x] inbetween temp sensor reads
 - [x] Wakes up on interrupt
 
 Shift Registers:
@@ -33,11 +33,9 @@ I2C:
 - [x] 10 second timer to trigger temp update
 - [x] 400kHz
 
-UART and SPI:
-- SPI is nice to have, might be implemented
+UART:
 - Can send and receive data using:
   - [x] UART
-  - [ ] SPI
 - Commands/Messages:
   - [x] Set Time -> 0x11 followed by 0xHHMMSS
   - [x] Reqest Temp Mode -> 0x22
@@ -55,5 +53,3 @@ UART and SPI:
               Clock Mode Request Message
  [ START_MSG | START_MSG | CLOCK_MODE | END_MSG ]
 
-
-Power Management -> Shift Regs -> Switches and Buttons -> I2C -> UART and SPI 
