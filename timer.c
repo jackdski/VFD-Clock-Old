@@ -42,6 +42,8 @@ void configure_temperature_timer() {
     NVIC_EnableIRQ(TA1_0_IRQn);
 }
 
+
+/* T I M E R   I N T E R R U P T   F U N C T I O N S */
 void TA0_0_IRQHandler() {
 
 //    TIMER_A0->CTL &= ~(BIT1);  //Turn off timer interrupts

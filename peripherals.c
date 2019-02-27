@@ -26,6 +26,30 @@ extern uint8_t buttonCount;
 extern CircBuf_t * RXBuf;
 extern CircBuf_t * TXBuf;
 
+extern uint8_t parse_request;
+
+
+/* M E S S A G E   M A C R O S */
+
+#define    START_MSG       0xFE
+#define    SET_TIME        0x11
+#define    TEMP_MODE       0x22
+#define    CLOCK_MODE      0x33
+#define    END_MSG         0x0F
+
+/*                  Message Structure
+ * [ START_MSG | START_MSG | FUNCTION | DATA ... DATA | SIZE | END_MSG ]
+ *
+ *                  Time Setting Message
+ * [ START_MSG | START_MSG | SET_TIME | HOURS | MINUTES | END_MSG ]
+ *
+ *               Temp. Mode Request Message
+ * [ START_MSG | START_MSG | TEMP_MODE | END_MSG ]
+ *
+ *             Clock Mode Request Message
+ * [ START_MSG | START_MSG | CLOCK_MODE | END_MSG ]
+ */
+
 /* --- P E R I P H E R A L S   F U N C T I O N S --- */
 
 void configure_SystemClock(){
@@ -123,7 +147,57 @@ void configure_all_pins() {
     P10->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
 }
 
-// +/- control
+
+/* parse the message received */
+uint8_t parse_rx_message(CircBuf_t * rxbuf) {
+    UCA0IE &= ~(BIT0 | BIT1);  //Turn on interrupts for RX and TX
+
+    uint8_t start[2];
+    uint8_t msg_function;
+
+    start[0] = removeItem(rxbuf);
+    start[1] = removeItem(rxbuf);
+
+//    // shift through buffer until START_MSG is found
+//    while(start[0] != START_MSG && !isEmpty(rxbuf)) {
+//        start[1] = start[0];
+//        start[0] = removeItem(rxbuf);
+//    }
+
+    // check for double START_MSG
+    if(start[1] == START_MSG) {
+        msg_function = removeItem(rxbuf);
+
+        if(msg_function == SET_TIME) {
+            // set to setup mode
+            P2->OUT = BIT2;
+            hours = removeItem(rxbuf);
+            minutes = removeItem(rxbuf);
+            update_time(hours, minutes, seconds);// do update
+            return 1;
+        }
+
+        else if(msg_function == TEMP_MODE) {
+            switch_select = Temperature;    // set to temp mode
+            P2->OUT = BIT0;
+            return 2;
+        }
+
+        else if(msg_function == CLOCK_MODE) {
+            switch_select = Clock;
+            P2->OUT = BIT1;
+            return 3;
+        }
+    }
+    UCA0IE |= (BIT0 | BIT1);  //Turn on interrupts for RX and TX
+    resetCircBuf(rxbuf);
+    return 0;
+}
+
+
+/*   I N T E R R U P T   F U N C T I O N S   */
+
+// switch mode control
 void PORT5_IRQHandler() {
     // "+" Button
     if(P5->IFG & BIT1 && P5->IN & BIT0) {
@@ -179,15 +253,23 @@ void PORT5_IRQHandler() {
 
 // UART interrupts
 void EUSCIA0_IRQHandler(){
-    if (EUSCI_A0->IFG & BIT0){
-        addItemCircBuf(RXBuf, EUSCI_A0->RXBUF);
+    if (EUSCI_A0->IFG & BIT0){  // rx
+        uint8_t val = EUSCI_A0->RXBUF;  // read received byte
+
+        // if received signal is the end message and its not the only thing in the buffer,
+        //      call parse_rx_message() to do the mode change
+        if((val == END_MSG) && (get_length_buf(RXBuf) > 0))
+            parse_rx_message(RXBuf);
+        else
+            EUSCI_A0->TXBUF = (val); // echo for now
+            addItemCircBuf(RXBuf, val);
     }
-    if (EUSCI_A0->IFG & BIT1){
-        //Transmit Stuff
+    if (EUSCI_A0->IFG & BIT1){  // tx
         if(isEmpty(TXBuf)) {
             EUSCI_A0->IFG &= ~BIT1;
             return;
         }
         EUSCI_A0->TXBUF = removeItem(TXBuf);
     }
+    EUSCI_A0->IFG = 0;
 }

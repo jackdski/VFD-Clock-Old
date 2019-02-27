@@ -25,6 +25,6 @@ void        addItemCircBuf(CircBuf_t * buf, uint8_t item);
 uint8_t     isEmpty(CircBuf_t * buf);
 void        loadToBuf(CircBuf_t * buf, uint8_t * string, uint8_t length);
 uint8_t     removeItem(CircBuf_t * buf);
-
+uint8_t get_length_buf(CircBuf_t * buf);
 
 #endif

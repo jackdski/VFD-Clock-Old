@@ -35,7 +35,10 @@ void configure_rtc() {
 }
 
 
+/*   R T C   I N T E R R U P T   F U N C T I O N */
+
 void RTC_C_IRQHandler() {
+    // TODO: set pin high for length measurement
     // if ready to read from
     if(RTCCTL0_L & RTC_C_CTL0_RDYIFG) { // if correct interrupt
         P2->OUT |= BIT0; // test to see if interrupt happened
@@ -84,5 +87,6 @@ void RTC_C_IRQHandler() {
 
 //    RTCCTL0_L &=  !RTC_C_CTL0_RDYIFG;// clear interrupt flag?
     RTCIV &= 0x00; // clear interrupt
+    // TODO: set pin low for length measurement
     enable_low_power_mode();
 }

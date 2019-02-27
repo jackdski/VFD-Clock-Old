@@ -20,7 +20,7 @@
 /* --- G L O B A L   V A R I A B L E S --- */
 
 // Switch Mode Select
-SwitchMode switch_select = Normal;
+SwitchMode switch_select = Clock;
 
 /*  Display initializes to all segments on
  *      -Defaults to 00:00:00
@@ -46,7 +46,6 @@ volatile uint8_t buttonCount = 0b00000000;
 volatile uint8_t update_request;   // 1 if update is need from button press
 volatile uint8_t temperature_update_request = 0; // sample temperature if 1
 volatile uint16_t temperature_timer_count = 0;   // count to 400 for 5s
-
 
 
 /* -----M A I N----- */
@@ -76,7 +75,7 @@ void main(void) {
 
 	/*--MAIN LOOP--*/
 	while(1) {
-        if(switch_select == Normal) {
+        if(switch_select == Clock) {
             // if RTC interrupts are off turn them on
             if(NVIC->ISER[(((uint32_t)(int32_t)RTC_C_IRQn) >> 5UL)] ==
                     (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {

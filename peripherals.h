@@ -11,9 +11,9 @@
 #include "msp.h"
 
 typedef enum SwitchMode {
-    Normal = 0,
-    Setup  = 1,
-    Temperature = 2
+    Clock = 0,         // displays clock
+    Setup  = 1,         // set time
+    Temperature = 2     // displays temperature
 }SwitchMode;
 
 void configure_SystemClock();
@@ -25,5 +25,7 @@ void configure_buttons();
 void configure_leds();
 
 void configure_all_pins();
+
+uint8_t parse_rx_message(CircBuf_t * rxbuf);
 
 #endif
