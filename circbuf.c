@@ -118,6 +118,14 @@ uint8_t removeItem(CircBuf_t * buf) {
     return data;
 }
 
+uint8_t readLastItem(CircBuf_t * buf) {
+    if(!buf)
+        return 0xFF;
+    if(buf->num_items == 0)
+        return 0xFF;
+    return (uint8_t)*buf->tail;
+
+}
 
 // jdanielski
 uint8_t get_length_buf(CircBuf_t * buf) {

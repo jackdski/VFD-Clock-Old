@@ -41,6 +41,7 @@ volatile uint8_t doButtons = 0;
 volatile uint8_t buttonCount = 0;
 
 volatile uint8_t parse_request = 0;
+volatile uint8_t global_temp = 0;
 
 void main(void) {
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
@@ -58,7 +59,7 @@ void main(void) {
 	configure_leds();
 //	configure_shift_pins();
 //
-//	__enable_irq();
+	__enable_irq();
 //
 //
 //    updateTime(hours, minutes, seconds);
@@ -66,10 +67,11 @@ void main(void) {
 
 	/* MAIN LOOP */
 	while(1) {
-	    if(parse_request) {
+	    if(parse_request == 1) {
+            parse_request == 0;
 	        uint8_t parse_status = parse_rx_message(RXBuf);
 	        if(parse_status == 1) {     // SET_TIME
-	            update_time(hours, minutes, seconds);
+//	            update_time(hours, minutes, seconds);
 	            P2->OUT = BIT0;
 	        }
 	        else if (parse_status == 2){
@@ -84,5 +86,6 @@ void main(void) {
 	        resetCircBuf(RXBuf);
 	        parse_request == 0;
 	    }
+        parse_request == 0;
 	}
 }

@@ -142,16 +142,19 @@ void configure_all_pins() {
 }
 
 uint8_t parse_rx_message(CircBuf_t * rxbuf) {
+    UCA0IE &= ~(BIT0 | BIT1);  //Turn on interrupts for RX and TX
+
     uint8_t start[2];
     uint8_t msg_function;
 
     start[0] = removeItem(rxbuf);
+    start[1] = removeItem(rxbuf);
 
-    // shift through buffer until START_MSG is found
-    while(start[0] != START_MSG) {
-        start[1] = start[0];
-        start[0] = removeItem(rxbuf);
-    }
+//    // shift through buffer until START_MSG is found
+//    while(start[0] != START_MSG && !isEmpty(rxbuf)) {
+//        start[1] = start[0];
+//        start[0] = removeItem(rxbuf);
+//    }
 
     // check for double START_MSG
     if(start[1] == START_MSG) {
@@ -178,6 +181,7 @@ uint8_t parse_rx_message(CircBuf_t * rxbuf) {
             return 3;
         }
     }
+    UCA0IE |= (BIT0 | BIT1);  //Turn on interrupts for RX and TX
     return 0;
 }
 
@@ -185,17 +189,21 @@ uint8_t parse_rx_message(CircBuf_t * rxbuf) {
 // UART interrupts
 void EUSCIA0_IRQHandler(){
     if (EUSCI_A0->IFG & BIT0){
-        if(EUSCI_A0->RXBUF == END_MSG)
+        uint8_t val = EUSCI_A0->RXBUF;
+        if((val == END_MSG) && (get_length_buf(RXBuf) > 0))
             parse_request = 1;
-        EUSCI_A0->TXBUF = EUSCI_A0->RXBUF; // echo for now
-        addItemCircBuf(RXBuf, EUSCI_A0->RXBUF);
+        else
+            parse_request = 0;
+        EUSCI_A0->TXBUF = (val); // echo for now
+        addItemCircBuf(RXBuf, val);
     }
-    if (EUSCI_A0->IFG & BIT1){
-        //Transmit Everything in TXBuf
-        if(isEmpty(TXBuf)) {
-            EUSCI_A0->IFG &= ~BIT1;
-            return;
-        }
-        EUSCI_A0->TXBUF = removeItem(TXBuf);
-    }
+//    if (EUSCI_A0->IFG & BIT1){
+//        //Transmit Everything in TXBuf
+//        if(isEmpty(TXBuf)) {
+//            EUSCI_A0->IFG &= ~BIT1;
+//            return;
+//        }
+//        EUSCI_A0->TXBUF = removeItem(TXBuf);
+//    }
+    EUSCI_A0->IFG = 0;
 }
