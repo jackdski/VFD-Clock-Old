@@ -85,6 +85,8 @@ void main(void) {
 	        }
 	        resetCircBuf(RXBuf);
 	        parse_request == 0;
+	        int i;
+	        for(i=0; i < 100000; i++);
 	    }
         parse_request == 0;
 	}
