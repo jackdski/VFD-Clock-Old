@@ -98,29 +98,29 @@ void configure_i2c(){
 void writeRegister(uint8_t reg, uint8_t value){
 //    while(UCB0STATW & UCBBUSY);     // wait while busy
 //    while(UCB0CTLW0 & UCTXSTT);     // send start
-    UCB0CTL0 |= UCTR | UCTXSTT;     // send start and addy
-    while(UCB0CTLW0 & UCTXSTT);     // wait for start and addy to send
-    UCB0TXBUF = reg;                // send reg to be written to
-    while(!(UCB0IFG & UCTXIFG0));   // wait to send reg
-    UCB0TXBUF = value;              // send value to reg
-    while(!(UCB0IFG & UCTXIFG0));   //  wait for value to be sent
-    UCB0CTL0 |= UCTXSTP;            // send stop
-//    while(UCB0CTLW0 & UCTXSTP);     // wait for stop to be sent
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR | EUSCI_B_CTLW0_TXSTT;     // send start and addy
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);     // wait for start and addy to send
+    EUSCI_B0->TXBUF = reg;                // send reg to be written to
+    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));   // wait to send reg
+    EUSCI_B0->TXBUF = value;              // send value to reg
+    while(!(EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG0));   //  wait for value to be sent
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;            // send stop
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTP);     // wait for stop to be sent
 }
 
 
 uint8_t readRegister(uint8_t reg){
-    UCB0CTL0 |= UCTR | UCTXSTT;     // set to transmitter, send start and addy
-    while(UCB0CTLW0 & UCTXSTT);     // wait for start and addy to send
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR | EUSCI_B_CTLW0_TXSTT;     // set to transmitter, send start and addy
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTT);     // wait for start and addy to send
     UCB0TXBUF = reg;                // send the reg to be read
     while(!(UCB0IFG & UCTXIFG0));   // wait to be transmitted
-    UCB0CTL0 &= ~UCTR;              // set to receiver
-    UCB0CTL0 |= UCTXSTT;            // send restart
-    while(UCB0CTLW0 & UCTXSTT);     // wait for restart
+    EUSCI_B0->CTLW0 &= ~EUSCI_B_CTLW0_TR;              // set to receiver
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;            // send restart
+    while(EUSCI_B0->CTLW0& EUSCI_B_CTLW0_TXSTT);     // wait for restart
     //  while(!(UCB0IFG & UCRXIFG0));
-    UCB0CTL0 |= UCTXSTP;            // send stop
-    uint8_t rxValue = UCB0RXBUF;    // read received byte
-    while(UCB0CTLW0 & UCTXSTP);     // wait for stop to be sent
+    EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTP;            // send stop
+    uint8_t rxValue = EUSCI_B0->RXBUF;    // read received byte
+    while(EUSCI_B0->CTLW0 & EUSCI_B_CTLW0_TXSTP);     // wait for stop to be sent
     return rxValue;                 // return reg's value
 }
 
@@ -145,7 +145,7 @@ uint8_t read_temp_c() {
 
     // wait for new temp data
     while(status & 0x08 == 0) {
-        status = readRegister(OUT_T_MSB);
+        status = readRegister(STATUS);
     }
     temp_c = readRegister(OUT_T_MSB);
     return temp_c;
@@ -203,7 +203,6 @@ void EUSCIB0_IRQHandler() {
 
     if(EUSCI_B0->IFG & EUSCI_B_IFG_STPIFG) {
         EUSCI_B0->IFG &= ~EUSCI_B_IFG_STPIFG;
-        tx_size = 0;
     }
 
     // transmitting

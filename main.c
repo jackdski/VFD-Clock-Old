@@ -72,7 +72,7 @@ void main(void) {
 //        readRegister(0x00);   // status
 	    temp = read_temp_c();   // get temp
 	    int i;
-	    for(i=0;i < 100000; i++);
+	    for(i=0;i < 5000000; i++);
 
 	}
 }
