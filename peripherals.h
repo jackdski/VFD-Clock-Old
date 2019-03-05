@@ -13,7 +13,8 @@
 typedef enum SwitchMode {
     Normal = 0,
     Setup  = 1,
-    Temperature = 2
+    Temperature = 2,
+    Off = 3
 }SwitchMode;
 
 void configure_SystemClock();
@@ -21,6 +22,12 @@ void configure_SystemClock();
 void configure_uart();
 
 void configure_buttons();
+
+void configure_relay();
+
+void set_relay_on();
+
+void set_relay_off();
 
 void configure_leds();
 

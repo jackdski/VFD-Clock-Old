@@ -82,6 +82,15 @@ void main(void) {
 	            temperature_update_request = 0;
 	        }
 	    }
+	    else if(switch_select == Off) {
+	        /* reconfigure relay to be an open,
+	         * turn off RTC interrupts,
+	         * only enable power switch interrupt,
+	         * and put into low-power mode
+	         */
+	        NVIC_DisableIRQ(EUSCIA0_IRQn);
+
+	    }
 	}
 }
 

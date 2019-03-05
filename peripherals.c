@@ -95,6 +95,17 @@ void configure_leds() {
     P5->OUT &= ~(BIT3);
 }
 
+void configure_relay() {
+    /*  P6.0 -> Optoisolator High
+     *  P6.1 -> Optoisolator Low
+     */
+}
+
+void set_relay_on();
+
+void set_relay_off();
+
+
 /* set all unused pins to low for power reasons */
 void configure_all_pins() {
     P1->DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
@@ -129,23 +140,53 @@ void configure_all_pins() {
 }
 
 void PORT5_IRQHandler() {
+    // On/Off Switch
+    if(P5->IFG & BIT5) {    // change mode to Off
+        if(P5->IES & BIT5) {
+            P5->IES &= ~(BIT5);  // set to trigger flag on falling edge
+            switch_select = Off;
+        }
+        else if(!(P5->IES & BIT5)) {
+            // select mode and set edge directions
+            if((P5->IN & (BIT0 | BIT4))) {  // Temperature Mode
+                P5->IES &= ~(BIT0 | BIT4); // set to trigger flag on falling edge
+                switch_select = Temperature;
+            }
+            else if((P5->IN & BIT0) && !(P5->IN & BIT4)) {  // Setup Mode
+                P5->IES &= ~(BIT0); // set to trigger flag on falling edge
+                P5->IES |= (BIT4); // set to trigger flag on falling edge
+                switch_select = Setup;
+            }
+            else if(!(P5->IN & BIT0) && (P5->IN & BIT4)) {  // Temperature Mode
+                P5->IES |= (BIT0);    // trigger flags on rising edge
+                P5->IES &= ~(BIT4); // set to trigger flag on falling edge
+                switch_select = Temperature;
+            }
+            else if(!(P5->IN & BIT0) && !(P5->IN & BIT4)) {  // Normal Mode
+                P5->IES |= (BIT0 | BIT4);    // trigger flags on rising edge
+                switch_select = Normal;
+            }
+        }
+        P5->IFG = 0;
+    }
+
     // Setup Switch
     if(P5->IFG & BIT0) {    // change mode to Setup
         // maybe use (P5->IN & BIT0) instead
-        if((P5->IES & BIT0) && (P5->IN & BIT4)) {    // if Setup turns on and Temp Mode is on
-            P5->IES &= ~(BIT0); // set to trigger flag on falling edge
+        if((P5->IES & BIT0) && (P5->IN & BIT4)) {    // 11 - if Setup turns on and Temp Mode is on
+            P5->IES &= ~(BIT0 | BIT4); // set to trigger flag on falling edge
             switch_select = Temperature; // or setup??
         }
-        else if((P5->IES & BIT0) && !(P5->IN & BIT4)) { // if Setup turning on and Temp Mode off
+        else if((P5->IES & BIT0) && !(P5->IN & BIT4)) { // 10- if Setup turning on and Temp Mode off
             P5->IES |= BIT0;    // trigger flag on rising edge
             switch_select = Setup;
         }
-        else if(!(P5->IES & BIT0) && (P5->IN & BIT4)) {  // if Setup turning off and Temp mode on
+        else if(!(P5->IES & BIT0) && (P5->IN & BIT4)) {  // 01- if Setup turning off and Temp mode on
             P5->IES |= BIT0;    // trigger flag on rising edge
             switch_select = Temperature;
         }
-        else if(!(P5->IES & BIT0) && !(P5->IN & BIT4)) { // if Setup turning off and Temp mode off
-            P5->IES |= BIT0;    // trigger flag on rising edge
+        else if(!(P5->IES & BIT0) && !(P5->IN & BIT4)) { // 00 - if Setup turning off and Temp mode off
+            P5->IES |= (BIT0 | BIT4);    // trigger flag on rising edge
             switch_select = Normal;
         }
     }
@@ -212,7 +253,7 @@ void PORT5_IRQHandler() {
             switch_select = Temperature; // or setup??
         }
         else if((P5->IES & BIT4) && !(P5->IN & BIT0)) { // if go to temp and in show time mode
-            P5->IES |= BIT4;    // trigger flag on rising edge
+            P5->IES &= ~(BIT4); // set to trigger flag on falling edge
             switch_select = Temperature;
         }
         else if(!(P5->IES & BIT4) && (P5->IN & BIT0)) {  // if go to time and in setup mode
