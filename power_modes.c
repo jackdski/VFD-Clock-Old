@@ -28,25 +28,6 @@ void configure_low_power_modes(){
 }
 
 void enable_low_power_mode() {
-//    enters key value, requests LPM0_LDO_VCORE0 change
-//    while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY));
-//    PCM->CTL0 |= (PCM_CTL0_KEY_VAL | PCM_CTL0_CPM__LPM0_LDO_VCORE0);
-//    while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY));
-//    PCM->CTL0 = 0; // lock register
-//    if (PCM->IFG & PCM_IFG_AM_INVALID_TR_IFG) // error
-//        P2->OUT = BIT0; // red light
-//    else{
-//        P2->OUT = BIT1; // green light
-//    }
-//    SCB->SCR &= ~(SCB_SCR_SEVONPEND_Pos); // SEVONPEND, only enabled interrupts can wake
-//    SCB->SCR |= (SCB_SCR_SLEEPDEEP_Msk);
-//    SCB->SCR |= (SCB_SCR_SLEEPONEXIT_Msk);
-//    // Ensures the SLEEPONEXIT mask is set.
-//    __DSB();
-//    __WFI();
-//    Go to LPM0
-//    __sleep();
-
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
     PCM->CTL0 &= ~(PCM_CTL0_LPMR__LPM3);
     if(PCM->IFG & PCM_CLRIFG_CLR_LPM_INVALID_CLK_IFG) {

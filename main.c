@@ -60,7 +60,6 @@ void main(void) {
     // configuration function calls
 	//configure_all_pins();
 	configure_SystemClock();
-//	configure_rtc();
 	configure_uart();
 	configure_buttons();
 	configure_leds();
@@ -81,6 +80,7 @@ void main(void) {
                     (uint32_t)(1UL << (((uint32_t)(int32_t)RTC_C_IRQn) & 0x1FUL))) {
                 NVIC_EnableIRQ(RTC_C_IRQn);
             }
+            enable_low_power_mode();
         }
         else if(switch_select == Setup) {
             P2->OUT |= (BIT0 | BIT2); // indicate setup mode
@@ -91,7 +91,6 @@ void main(void) {
         }
         else if(switch_select == Temperature) {
             // need to add way of reseting timer_count
-
             set_mode_active();      // set temperature sensor active
             set_oversample_rate(7); // set oversample rate
             enable_event_flags();   // enable temperature sensor events
